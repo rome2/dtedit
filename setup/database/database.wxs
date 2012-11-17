@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="*" UpgradeCode="D93C448A-B08E-4A84-BDCA-E5FCA54A3F46" Version="1.0.0.0" Language="1033" Name="DT Edit" Manufacturer="Rolf Meyerhoff">
+    <Package Keywords="Installer" Description="DT Edit Installer" Manufacturer="Rolf Meyerhoff" InstallerVersion="300" Compressed="yes" InstallScope="perMachine" />
+    <Media Id="1" Cabinet="dtedit.cab" EmbedCab="yes" />
+
+    <!-- Guard against downgrades: -->
+    <MajorUpgrade DowngradeErrorMessage="A newer version of DT Ddit is already installed." />
+    
+    <!-- Icon and help link for "Add/Remove Programs": -->
+    <Icon Id="dtedit.ico" SourceFile="..\..\images\dtedit.ico" />
+    <Property Id="ARPPRODUCTICON" Value="dtedit.ico" />
+    <Property Id="ARPHELPLINK" Value="http://code.google.com/p/dtedit/" />
+
+    <!-- Force admin rights for this setup: -->
+    <Property Id="MSIUSEREALADMINDETECTION" Value="1" />
+    <Condition Message="You need to be an administrator to install this product.">Privileged</Condition>
+    
+    <!-- Setup directory structure:  -->
+    <Directory Id="TARGETDIR" Name="SourceDir">
+
+      <!-- Define the directory structure for the program files folder: -->
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLDIR" Name="DT Edit" />
+      </Directory>
+
+      <!-- Define the directory structure for the start menu folder: -->
+      <Directory Id="ProgramMenuFolder">
+        <Directory Id="ApplicationProgramsFolder" Name="DT Edit" />
+      </Directory>
+      
+    </Directory>
+
+    <!-- Add program files to your installer package: -->
+    <DirectoryRef Id="INSTALLDIR">
+
+      <!-- The main application: -->
+      <Component Id="mainApplication" Guid="4DB601AB-25AE-4CDA-998E-682E8126FA9C">
+        <File Id="dteditExe" Source="..\..\release\dtedit.exe" KeyPath="yes" Checksum="yes" />
+      </Component>
+
+      <!-- The files needed by QT: -->
+      <Component Id="qtFiles" Guid="C3F17BE3-7445-4AD8-81B7-F06C2225B4D7">
+        <File Id="QtCore4Dll" Source="..\external\QtCore4.dll" KeyPath="yes" Checksum="yes" />
+        <File Id="QtGui4Dll" Source="..\external\QtGui4.dll" Checksum="yes" />
+      </Component>
+
+      <!-- The files needed by the mingw runtime: -->
+      <Component Id="mingwFiles" Guid="C0B78DFB-20B0-4084-B751-B4BF998C8070">
+        <File Id="libgccSDw21Dll" Source="..\external\libgcc_s_dw2-1.dll" KeyPath="yes" Checksum="yes" />
+        <File Id="mingwm10Dll" Source="..\external\mingwm10.dll" Checksum="yes" />
+      </Component>
+
+      <!-- The license file: -->
+      <Component Id="license" Guid="8B73404B-D661-4902-B5F0-0B7C7775A300">
+        <File Id="COPYING" Source="..\..\COPYING.rtf" KeyPath="yes" />
+      </Component>
+      
+    </DirectoryRef>
+
+    <!-- Add start menu files to your installer package: -->
+    <DirectoryRef Id="ApplicationProgramsFolder">
+      <Component Id="ApplicationShortcut" Guid="F6847028-A3B7-44BD-B7C1-761C53FBC5E2">
+        <Shortcut Id="ApplicationStartMenuShortcut" Name="DT Edit" Description="A free editor for Line6 DT amplifiers" Target="[INSTALLDIR]dtedit.exe" WorkingDirectory="INSTALLDIR" Icon="dtedit.ico" />
+        <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall" />
+        <RegistryValue Root="HKCU" Key="Software\Microsoft\DTEdit" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </DirectoryRef>
+    
+    <!-- Install the files: -->
+    <Feature Id="MainApplication" Title="Main Application" Level="1">
+      <ComponentRef Id="mainApplication" />
+      <ComponentRef Id="qtFiles" />
+      <ComponentRef Id="mingwFiles" />
+      <ComponentRef Id="license" />
+      <ComponentRef Id="ApplicationShortcut" />
+    </Feature>
+
+    <!-- Include VC90 runtime: -->
+    <DirectoryRef Id="TARGETDIR">
+      <Merge Id="VCRedist" SourceFile="..\external\Microsoft_VC90_CRT_x86.msm" DiskId="1" Language="0"/>
+    </DirectoryRef>
+    <Feature Id="VCRedist" Title="Visual C++ 9.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
+      <MergeRef Id="VCRedist"/>
+    </Feature>
+    
+  </Product>
+</Wix>
