@@ -28,7 +28,7 @@
 #define __DT25EDIT_H_INCLUDED__
 
 // MIDI tools:
-#include "../RtMidi/RtMidi.h"
+#include "RtMidi/RtMidi.h"
 
 #define DT_MIDI_CHANNEL 0
 

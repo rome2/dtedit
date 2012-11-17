@@ -27,6 +27,6 @@
 #include "dtedit.h"
 
 // MIDI tools implementation:
-#include "../RtMidi/RtMidi.cpp"
+#include "RtMidi/RtMidi.cpp"
 
 ///////////////////////////////// End of File //////////////////////////////////

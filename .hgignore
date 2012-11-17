@@ -10,3 +10,4 @@ setup/bin/*
 setup/bootstrapper/obj/*
 setup/database/obj/*
 *.suo
+releases/*
