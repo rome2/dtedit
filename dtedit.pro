@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT += core gui xml
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -15,12 +15,14 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     setupdialog.cpp \
     aboutdialog.cpp \
-    dtedit.cpp
+    dtedit.cpp \
+    mainmidiwindow.cpp
 
 HEADERS  += mainwindow.h \
     setupdialog.h \
     aboutdialog.h \
-    dtedit.h
+    dtedit.h \
+    mainmidiwindow.h
 
 win* {
     DEFINES += __WINDOWS_MM__

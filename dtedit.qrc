@@ -6,5 +6,8 @@
         <file>images/midi.png</file>
         <file>images/dtedit.png</file>
         <file>images/dtedit64.png</file>
+        <file>images/open.png</file>
+        <file>images/save.png</file>
+        <file>images/save_as.png</file>
     </qresource>
 </RCC>

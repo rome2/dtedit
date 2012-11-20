@@ -11,3 +11,4 @@ setup/bootstrapper/obj/*
 setup/database/obj/*
 *.suo
 releases/*
+object_script.*

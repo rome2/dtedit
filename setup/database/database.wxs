@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <Product Id="*" UpgradeCode="D93C448A-B08E-4A84-BDCA-E5FCA54A3F46" Version="1.0.0.0" Language="1033" Name="DT Edit" Manufacturer="Rolf Meyerhoff">
+  <Product Id="*" UpgradeCode="D93C448A-B08E-4A84-BDCA-E5FCA54A3F46" Version="1.0.0.1" Language="1033" Name="DT Edit" Manufacturer="Rolf Meyerhoff">
     <Package Keywords="Installer" Description="DT Edit Installer" Manufacturer="Rolf Meyerhoff" InstallerVersion="300" Compressed="yes" InstallScope="perMachine" />
     <Media Id="1" Cabinet="dtedit.cab" EmbedCab="yes" />
 
     <!-- Guard against downgrades: -->
     <MajorUpgrade DowngradeErrorMessage="A newer version of DT Ddit is already installed." />
-    
+
     <!-- Icon and help link for "Add/Remove Programs": -->
     <Icon Id="dtedit.ico" SourceFile="..\..\images\dtedit.ico" />
     <Property Id="ARPPRODUCTICON" Value="dtedit.ico" />
@@ -15,7 +15,7 @@
     <!-- Force admin rights for this setup: -->
     <Property Id="MSIUSEREALADMINDETECTION" Value="1" />
     <Condition Message="You need to be an administrator to install this product.">Privileged</Condition>
-    
+
     <!-- Setup directory structure:  -->
     <Directory Id="TARGETDIR" Name="SourceDir">
 
@@ -28,7 +28,7 @@
       <Directory Id="ProgramMenuFolder">
         <Directory Id="ApplicationProgramsFolder" Name="DT Edit" />
       </Directory>
-      
+
     </Directory>
 
     <!-- Add program files to your installer package: -->
@@ -43,6 +43,7 @@
       <Component Id="qtFiles" Guid="C3F17BE3-7445-4AD8-81B7-F06C2225B4D7">
         <File Id="QtCore4Dll" Source="..\external\QtCore4.dll" KeyPath="yes" Checksum="yes" />
         <File Id="QtGui4Dll" Source="..\external\QtGui4.dll" Checksum="yes" />
+        <File Id="QtXml4Dll" Source="..\external\QtXml4.dll" Checksum="yes" />
       </Component>
 
       <!-- The files needed by the mingw runtime: -->
@@ -55,7 +56,7 @@
       <Component Id="license" Guid="8B73404B-D661-4902-B5F0-0B7C7775A300">
         <File Id="COPYING" Source="..\..\COPYING.rtf" KeyPath="yes" />
       </Component>
-      
+
     </DirectoryRef>
 
     <!-- Add start menu files to your installer package: -->
@@ -66,7 +67,7 @@
         <RegistryValue Root="HKCU" Key="Software\Microsoft\DTEdit" Name="installed" Type="integer" Value="1" KeyPath="yes" />
       </Component>
     </DirectoryRef>
-    
+
     <!-- Install the files: -->
     <Feature Id="MainApplication" Title="Main Application" Level="1">
       <ComponentRef Id="mainApplication" />
@@ -83,6 +84,6 @@
     <Feature Id="VCRedist" Title="Visual C++ 9.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
       <MergeRef Id="VCRedist"/>
     </Feature>
-    
+
   </Product>
 </Wix>

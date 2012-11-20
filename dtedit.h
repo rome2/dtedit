@@ -24,12 +24,13 @@
 /// or write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
 /// Floor, Boston, MA 02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
-#ifndef __DT25EDIT_H_INCLUDED__
-#define __DT25EDIT_H_INCLUDED__
+#ifndef __DTEDIT_H_INCLUDED__
+#define __DTEDIT_H_INCLUDED__
 
 // MIDI tools:
 #include "RtMidi/RtMidi.h"
 
+// The DT's MIDI channel:
 #define DT_MIDI_CHANNEL 0
 
 // Control IDs:
@@ -194,5 +195,5 @@
 #define REV_ECHO          11
 #define REV_PARTICLE_VERB 12
 
-#endif // #ifndef __DT25EDIT_H_INCLUDED__
+#endif // #ifndef __DTEDIT_H_INCLUDED__
 ///////////////////////////////// End of File //////////////////////////////////

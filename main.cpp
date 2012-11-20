@@ -26,6 +26,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 #include <QtGui/QApplication>
 #include "dtedit.h"
+#include "mainmidiwindow.h"
 #include "mainwindow.h"
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -48,8 +49,8 @@ int main(int argc, char** argv)
   // Set programm properties, used by QSettings and others:
   a.setApplicationName   (QString("DTEdit"));
   a.setApplicationVersion(QString("1.0"));
-  a.setOrganizationName  (QString("IndyGo"));
-  a.setOrganizationDomain(QString("indygo.de"));
+  a.setOrganizationName  (QString("Rolf Meyerhoff"));
+  a.setOrganizationDomain(QString("dtedit.googlecode.com"));
 
   // Create and show the main application window:
   MainWindow w;
