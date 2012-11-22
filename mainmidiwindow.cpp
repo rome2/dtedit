@@ -164,7 +164,7 @@ bool MainMIDIWindow::showSetupWindow()
 ///\param   [in] noteNumber: Note number.
 ///\param   [in] velocity:   Note velocity.
 ////////////////////////////////////////////////////////////////////////////////
-void MainMIDIWindow::noteOnReceived(unsigned char channel, unsigned char noteNumber, unsigned char velocity)
+void MainMIDIWindow::noteOnReceived(unsigned char /*channel*/, unsigned char /*noteNumber*/, unsigned char /*velocity*/)
 {
   // Log message:
   //QString s;
@@ -180,7 +180,7 @@ void MainMIDIWindow::noteOnReceived(unsigned char channel, unsigned char noteNum
 ///\param   [in] noteNumber: Note number.
 ///\param   [in] velocity:   Note velocity.
 ////////////////////////////////////////////////////////////////////////////////
-void MainMIDIWindow::noteOffReceived(unsigned char channel, unsigned char noteNumber, unsigned char velocity)
+void MainMIDIWindow::noteOffReceived(unsigned char /*channel*/, unsigned char /*noteNumber*/, unsigned char /*velocity*/)
 {
   // Log message:
   //QString s;
@@ -196,7 +196,7 @@ void MainMIDIWindow::noteOffReceived(unsigned char channel, unsigned char noteNu
 ///\param   [in] controlNumber: Controller number.
 ///\param   [in] value:         Control value.
 ////////////////////////////////////////////////////////////////////////////////
-void MainMIDIWindow::controlChangeReceived(unsigned char channel, unsigned char controlNumber, unsigned char value)
+void MainMIDIWindow::controlChangeReceived(unsigned char /*channel*/, unsigned char /*controlNumber*/, unsigned char /*value*/)
 {
   // Log message:
   //QString s;
@@ -211,7 +211,7 @@ void MainMIDIWindow::controlChangeReceived(unsigned char channel, unsigned char 
 ///\param   [in] channel: MIDI channel of this message.
 ///\param   [in] value:   Program number.
 ////////////////////////////////////////////////////////////////////////////////
-void MainMIDIWindow::programChangeReceived(unsigned char channel, unsigned char value)
+void MainMIDIWindow::programChangeReceived(unsigned char /*channel*/, unsigned char /*value*/)
 {
   // Log message:
   //QString s;
@@ -226,7 +226,7 @@ void MainMIDIWindow::programChangeReceived(unsigned char channel, unsigned char 
 ///\param   [in] channel: MIDI channel of this message.
 ///\param   [in] value:   Pressure value.
 ////////////////////////////////////////////////////////////////////////////////
-void MainMIDIWindow::channelAftertouchReceived(unsigned char channel, unsigned char value)
+void MainMIDIWindow::channelAftertouchReceived(unsigned char /*channel*/, unsigned char /*value*/)
 {
   // Log message:
   //QString s;
@@ -241,7 +241,7 @@ void MainMIDIWindow::channelAftertouchReceived(unsigned char channel, unsigned c
 ///\param   [in] channel: MIDI channel of this message.
 ///\param   [in] value:   Pitch bend value.
 ////////////////////////////////////////////////////////////////////////////////
-void MainMIDIWindow::pitchBendReceived(unsigned char channel, unsigned short value)
+void MainMIDIWindow::pitchBendReceived(unsigned char /*channel*/, unsigned short /*value*/)
 {
   // Log message:
   //QString s;
@@ -257,7 +257,7 @@ void MainMIDIWindow::pitchBendReceived(unsigned char channel, unsigned short val
 ///\param   [in] noteNumber: Note number.
 ///\param   [in] value:      Pressure value.
 ////////////////////////////////////////////////////////////////////////////////
-void MainMIDIWindow::polyAftertouchReceived(unsigned char channel, unsigned char noteNumber, unsigned char value)
+void MainMIDIWindow::polyAftertouchReceived(unsigned char /*channel*/, unsigned char /*noteNumber*/, unsigned char /*value*/)
 {
   // Log message:
   //QString s;
@@ -272,7 +272,7 @@ void MainMIDIWindow::polyAftertouchReceived(unsigned char channel, unsigned char
 ///\param   [in] buff: The message buffer.
 ///\param   [in] value:      Pressure value.
 ////////////////////////////////////////////////////////////////////////////////
-void MainMIDIWindow::sysExReceived(const std::vector<unsigned char>& buff)
+void MainMIDIWindow::sysExReceived(const std::vector<unsigned char>& /*buff*/)
 {
   // Log message:
   //QString s;

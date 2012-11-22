@@ -160,8 +160,12 @@ void MainWindow::controlChangeReceived(unsigned char channel, unsigned char cont
   if (controlNumber == 127)
     blocked = value >= 64;
 
+  // UI locked?
   if (blocked)
     return;
+
+  // Lock the GUI:
+  blocked = true;
 
   switch (controlNumber)
   {
@@ -316,6 +320,9 @@ void MainWindow::controlChangeReceived(unsigned char channel, unsigned char cont
     master->setValue(value);
     break;
   }
+
+  // Unlock the GUI:
+  blocked = false;
 }
 
 void MainWindow::readFile(const QString& fileName)
@@ -645,72 +652,54 @@ void MainWindow::createEditArea()
   label->setGeometry(10, 58, 30, 20);
 
   // Channel A gain dial:
-  gainA = new QDial(group);
-  gainA->setMinimum(0);
-  gainA->setMaximum(127);
+  gainA = new DTDial(group, CC_GAIN_A);
   gainA->setGeometry(200, 26, 32, 32);
-  gainA->setTracking(true);
-  connect(gainA, SIGNAL(valueChanged(int)), this, SLOT(gainAChanged(int)));
+  connect(gainA, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
   label = new QLabel(group);
   label->setText("Drive");
   label->setAlignment(Qt::AlignHCenter);
   label->setGeometry(184, 58, 64, 20);
 
   // Channel A bass dial:
-  bassA = new QDial(group);
-  bassA->setMinimum(0);
-  bassA->setMaximum(127);
+  bassA = new DTDial(group, CC_BASS_A);
   bassA->setGeometry(264, 26, 32, 32);
-  bassA->setTracking(true);
-  connect(bassA, SIGNAL(valueChanged(int)), this, SLOT(bassAChanged(int)));
+  connect(bassA, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
   label = new QLabel(group);
   label->setText("Bass");
   label->setAlignment(Qt::AlignHCenter);
   label->setGeometry(248, 58, 64, 20);
 
   // Channel A middle dial:
-  middleA = new QDial(group);
-  middleA->setMinimum(0);
-  middleA->setMaximum(127);
+  middleA = new DTDial(group, CC_MIDDLE_A);
   middleA->setGeometry(328, 26, 32, 32);
-  middleA->setTracking(true);
-  connect(middleA, SIGNAL(valueChanged(int)), this, SLOT(middleAChanged(int)));
+  connect(middleA, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
   label = new QLabel(group);
   label->setText("Middle");
   label->setAlignment(Qt::AlignHCenter);
   label->setGeometry(312, 58, 64, 20);
 
   // Channel A treble dial:
-  trebleA = new QDial(group);
-  trebleA->setMinimum(0);
-  trebleA->setMaximum(127);
+  trebleA = new DTDial(group, CC_TREBLE_A);
   trebleA->setGeometry(394, 26, 32, 32);
-  trebleA->setTracking(true);
-  connect(trebleA, SIGNAL(valueChanged(int)), this, SLOT(trebleAChanged(int)));
+  connect(trebleA, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
   label = new QLabel(group);
   label->setText("Treble");
   label->setAlignment(Qt::AlignHCenter);
   label->setGeometry(378, 58, 64, 20);
 
   // Channel A presence dial:
-  presenceA = new QDial(group);
-  presenceA->setMinimum(0);
-  presenceA->setMaximum(127);
+  presenceA = new DTDial(group, CC_PRESENCE_A);
   presenceA->setGeometry(460, 26, 32, 32);
-  presenceA->setTracking(true);
-  connect(presenceA, SIGNAL(valueChanged(int)), this, SLOT(presenceAChanged(int)));
+  connect(presenceA, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
   label = new QLabel(group);
   label->setText("Presence");
   label->setAlignment(Qt::AlignHCenter);
   label->setGeometry(444, 58, 64, 20);
 
   // Channel A volume dial:
-  volumeA = new QDial(group);
-  volumeA->setMinimum(0);
-  volumeA->setMaximum(127);
+  volumeA = new DTDial(group, CC_VOLUME_A);
   volumeA->setGeometry(524, 26, 32, 32);
-  volumeA->setTracking(group);
-  connect(volumeA, SIGNAL(valueChanged(int)), this, SLOT(volumeAChanged(int)));
+  connect(volumeA, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
   label = new QLabel(group);
   label->setText("Volume");
   label->setAlignment(Qt::AlignHCenter);
@@ -770,48 +759,36 @@ void MainWindow::createEditArea()
   label->setGeometry(10, 58, 30, 20);
 
   // Reverb A decay dial:
-  reverbDecayA = new QDial(group);
-  reverbDecayA->setMinimum(0);
-  reverbDecayA->setMaximum(127);
+  reverbDecayA = new DTDial(group, CC_REV_DECAY_A);
   reverbDecayA->setGeometry(200, 26, 32, 32);
-  reverbDecayA->setTracking(true);
-  connect(reverbDecayA, SIGNAL(valueChanged(int)), this, SLOT(reverbDecayAChanged(int)));
+  connect(reverbDecayA, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
   label = new QLabel(group);
   label->setText("Decay");
   label->setAlignment(Qt::AlignHCenter);
   label->setGeometry(184, 58, 64, 20);
 
   // Reverb A predelay dial:
-  reverbPredelayA = new QDial(group);
-  reverbPredelayA->setMinimum(0);
-  reverbPredelayA->setMaximum(127);
+  reverbPredelayA = new DTDial(group, CC_REV_PREDELAY_A);
   reverbPredelayA->setGeometry(264, 26, 32, 32);
-  reverbPredelayA->setTracking(true);
-  connect(reverbPredelayA, SIGNAL(valueChanged(int)), this, SLOT(reverbPredelayAChanged(int)));
+  connect(reverbPredelayA, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
   label = new QLabel(group);
   label->setText("Pre Delay");
   label->setAlignment(Qt::AlignHCenter);
   label->setGeometry(248, 58, 64, 20);
 
   // Reverb A tone dial:
-  reverbToneA = new QDial(group);
-  reverbToneA->setMinimum(0);
-  reverbToneA->setMaximum(127);
+  reverbToneA = new DTDial(group, CC_REV_TONE_A);
   reverbToneA->setGeometry(328, 26, 32, 32);
-  reverbToneA->setTracking(true);
-  connect(reverbToneA, SIGNAL(valueChanged(int)), this, SLOT(reverbToneAChanged(int)));
+  connect(reverbToneA, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
   label = new QLabel(group);
   label->setText("Tone");
   label->setAlignment(Qt::AlignHCenter);
   label->setGeometry(312, 58, 64, 20);
 
   // Reverb A mix dial:
-  reverbMixA = new QDial(group);
-  reverbMixA->setMinimum(0);
-  reverbMixA->setMaximum(127);
+  reverbMixA = new DTDial(group, CC_REV_MIX_A);
   reverbMixA->setGeometry(394, 26, 32, 32);
-  reverbMixA->setTracking(true);
-  connect(reverbMixA, SIGNAL(valueChanged(int)), this, SLOT(reverbMixAChanged(int)));
+  connect(reverbMixA, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
   label = new QLabel(group);
   label->setText("Mix");
   label->setAlignment(Qt::AlignHCenter);
@@ -824,12 +801,9 @@ void MainWindow::createEditArea()
   group->setGeometry(700, menuBar()->height() + 8, 255, 194);
 
   // Channel A Class A/AB switch:
-  classA = new QSlider(group);
+  classA = new DTSlider(group, CC_CLASS_A);
   classA->setGeometry(26, 40, 32, 28);
-  classA->setMinimum(0);
-  classA->setMaximum(1);
-  classA->setTickPosition(QSlider::NoTicks);
-  connect(classA, SIGNAL(valueChanged(int)), this, SLOT(classAChanged(int)));
+  connect(classA, SIGNAL(valueChanged2(int, int)), this, SLOT(sliderChanged(int, int)));
   label = new QLabel(group);
   label->setText("Class A/B");
   label->setAlignment(Qt::AlignHCenter);
@@ -840,12 +814,9 @@ void MainWindow::createEditArea()
   label->setGeometry(10, 68, 64, 20);
 
   // Channel A Pentode/Triode switch:
-  xtodeA = new QSlider(group);
+  xtodeA = new DTSlider(group, CC_XTODE_A);
   xtodeA->setGeometry(196, 40, 32, 28);
-  xtodeA->setMinimum(0);
-  xtodeA->setMaximum(1);
-  xtodeA->setTickPosition(QSlider::NoTicks);
-  connect(xtodeA, SIGNAL(valueChanged(int)), this, SLOT(xtodeAChanged(int)));
+  connect(xtodeA, SIGNAL(valueChanged2(int, int)), this, SLOT(sliderChanged(int, int)));
   label = new QLabel(group);
   label->setText("Pentode");
   label->setAlignment(Qt::AlignHCenter);
@@ -879,12 +850,9 @@ void MainWindow::createEditArea()
   label->setGeometry(90, 68, 80, 20);
 
   // Channel A boost switch:
-  boostA = new QSlider(group);
+  boostA = new DTSlider(group, CC_BOOST_A);
   boostA->setGeometry(26, 132, 32, 28);
-  boostA->setMinimum(0);
-  boostA->setMaximum(1);
-  boostA->setTickPosition(QSlider::NoTicks);
-  connect(boostA, SIGNAL(valueChanged(int)), this, SLOT(boostAChanged(int)));
+  connect(boostA, SIGNAL(valueChanged2(int, int)), this, SLOT(sliderChanged(int, int)));
   label = new QLabel(group);
   label->setText("On");
   label->setAlignment(Qt::AlignHCenter);
@@ -895,12 +863,9 @@ void MainWindow::createEditArea()
   label->setGeometry(10, 160, 64, 20);
 
   // Channel A PI voltage switch:
-  pivoltA = new QSlider(group);
+  pivoltA = new DTSlider(group, CC_PI_VOLTAGE_A);
   pivoltA->setGeometry(110, 132, 32, 28);
-  pivoltA->setMinimum(0);
-  pivoltA->setMaximum(1);
-  pivoltA->setTickPosition(QSlider::NoTicks);
-  connect(pivoltA, SIGNAL(valueChanged(int)), this, SLOT(pivoltAChanged(int)));
+  connect(pivoltA, SIGNAL(valueChanged2(int, int)), this, SLOT(sliderChanged(int,int)));
   label = new QLabel(group);
   label->setText("PIV High");
   label->setAlignment(Qt::AlignHCenter);
@@ -911,12 +876,9 @@ void MainWindow::createEditArea()
   label->setGeometry(94, 160, 64, 20);
 
   // Channel A Cap X/Y switch:
-  capA = new QSlider(group);
+  capA = new DTSlider(group, CC_CAP_TYPE_A);
   capA->setGeometry(196, 132, 32, 28);
-  capA->setMinimum(0);
-  capA->setMaximum(1);
-  capA->setTickPosition(QSlider::NoTicks);
-  connect(capA, SIGNAL(valueChanged(int)), this, SLOT(capAChanged(int)));
+  connect(capA, SIGNAL(valueChanged2(int, int)), this, SLOT(sliderChanged(int, int)));
   label = new QLabel(group);
   label->setText("Tight");
   label->setAlignment(Qt::AlignHCenter);
@@ -1000,72 +962,54 @@ void MainWindow::createEditArea()
   label->setGeometry(10, 58, 30, 20);
 
   // Channel B gain dial:
-  gainB = new QDial(group);
-  gainB->setMinimum(0);
-  gainB->setMaximum(127);
+  gainB = new DTDial(group, CC_GAIN_B);
   gainB->setGeometry(200, 26, 32, 32);
-  gainB->setTracking(true);
-  connect(gainB, SIGNAL(valueChanged(int)), this, SLOT(gainBChanged(int)));
+  connect(gainB, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
   label = new QLabel(group);
   label->setText("Drive");
   label->setAlignment(Qt::AlignHCenter);
   label->setGeometry(184, 58, 64, 20);
 
   // Channel B bass dial:
-  bassB = new QDial(group);
-  bassB->setMinimum(0);
-  bassB->setMaximum(127);
+  bassB = new DTDial(group, CC_BASS_B);
   bassB->setGeometry(264, 26, 32, 32);
-  bassB->setTracking(true);
-  connect(bassB, SIGNAL(valueChanged(int)), this, SLOT(bassBChanged(int)));
+  connect(bassB, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
   label = new QLabel(group);
   label->setText("Bass");
   label->setAlignment(Qt::AlignHCenter);
   label->setGeometry(248, 58, 64, 20);
 
   // Channel B middle dial:
-  middleB = new QDial(group);
-  middleB->setMinimum(0);
-  middleB->setMaximum(127);
+  middleB = new DTDial(group, CC_MIDDLE_B);
   middleB->setGeometry(328, 26, 32, 32);
-  middleB->setTracking(true);
-  connect(middleB, SIGNAL(valueChanged(int)), this, SLOT(middleBChanged(int)));
+  connect(middleB, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
   label = new QLabel(group);
   label->setText("Middle");
   label->setAlignment(Qt::AlignHCenter);
   label->setGeometry(312, 58, 64, 20);
 
   // Channel B treble dial:
-  trebleB = new QDial(group);
-  trebleB->setMinimum(0);
-  trebleB->setMaximum(127);
+  trebleB = new DTDial(group, CC_TREBLE_B);
   trebleB->setGeometry(394, 26, 32, 32);
-  trebleB->setTracking(true);
-  connect(trebleB, SIGNAL(valueChanged(int)), this, SLOT(trebleBChanged(int)));
+  connect(trebleB, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
   label = new QLabel(group);
   label->setText("Treble");
   label->setAlignment(Qt::AlignHCenter);
   label->setGeometry(378, 58, 64, 20);
 
   // Channel B presence dial:
-  presenceB = new QDial(group);
-  presenceB->setMinimum(0);
-  presenceB->setMaximum(127);
+  presenceB = new DTDial(group, CC_PRESENCE_B);
   presenceB->setGeometry(460, 26, 32, 32);
-  presenceB->setTracking(true);
-  connect(presenceB, SIGNAL(valueChanged(int)), this, SLOT(presenceBChanged(int)));
+  connect(presenceB, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
   label = new QLabel(group);
   label->setText("Presence");
   label->setAlignment(Qt::AlignHCenter);
   label->setGeometry(444, 58, 64, 20);
 
   // Channel B volume dial:
-  volumeB = new QDial(group);
-  volumeB->setMinimum(0);
-  volumeB->setMaximum(127);
+  volumeB = new DTDial(group, CC_VOLUME_B);
   volumeB->setGeometry(524, 26, 32, 32);
-  volumeB->setTracking(group);
-  connect(volumeB, SIGNAL(valueChanged(int)), this, SLOT(volumeBChanged(int)));
+  connect(volumeB, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
   label = new QLabel(group);
   label->setText("Volume");
   label->setAlignment(Qt::AlignHCenter);
@@ -1125,48 +1069,36 @@ void MainWindow::createEditArea()
   label->setGeometry(10, 58, 30, 20);
 
   // Reverb B decay dial:
-  reverbDecayB = new QDial(group);
-  reverbDecayB->setMinimum(0);
-  reverbDecayB->setMaximum(127);
+  reverbDecayB = new DTDial(group, CC_REV_DECAY_B);
   reverbDecayB->setGeometry(200, 26, 32, 32);
-  reverbDecayB->setTracking(true);
-  connect(reverbDecayB, SIGNAL(valueChanged(int)), this, SLOT(reverbDecayBChanged(int)));
+  connect(reverbDecayB, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
   label = new QLabel(group);
   label->setText("Decay");
   label->setAlignment(Qt::AlignHCenter);
   label->setGeometry(184, 58, 64, 20);
 
   // Reverb B predelay dial:
-  reverbPredelayB = new QDial(group);
-  reverbPredelayB->setMinimum(0);
-  reverbPredelayB->setMaximum(127);
+  reverbPredelayB = new DTDial(group, CC_REV_PREDELAY_B);
   reverbPredelayB->setGeometry(264, 26, 32, 32);
-  reverbPredelayB->setTracking(true);
-  connect(reverbPredelayB, SIGNAL(valueChanged(int)), this, SLOT(reverbPredelayBChanged(int)));
+  connect(reverbPredelayB, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
   label = new QLabel(group);
   label->setText("Pre Delay");
   label->setAlignment(Qt::AlignHCenter);
   label->setGeometry(248, 58, 64, 20);
 
   // Reverb B tone dial:
-  reverbToneB = new QDial(group);
-  reverbToneB->setMinimum(0);
-  reverbToneB->setMaximum(127);
+  reverbToneB = new DTDial(group, CC_REV_TONE_B);
   reverbToneB->setGeometry(328, 26, 32, 32);
-  reverbToneB->setTracking(true);
-  connect(reverbToneB, SIGNAL(valueChanged(int)), this, SLOT(reverbToneBChanged(int)));
+  connect(reverbToneB, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
   label = new QLabel(group);
   label->setText("Tone");
   label->setAlignment(Qt::AlignHCenter);
   label->setGeometry(312, 58, 64, 20);
 
   // Reverb B mix dial:
-  reverbMixB = new QDial(group);
-  reverbMixB->setMinimum(0);
-  reverbMixB->setMaximum(127);
+  reverbMixB = new DTDial(group, CC_REV_MIX_B);
   reverbMixB->setGeometry(394, 26, 32, 32);
-  reverbMixB->setTracking(true);
-  connect(reverbMixB, SIGNAL(valueChanged(int)), this, SLOT(reverbMixBChanged(int)));
+  connect(reverbMixB, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
   label = new QLabel(group);
   label->setText("Mix");
   label->setAlignment(Qt::AlignHCenter);
@@ -1179,12 +1111,9 @@ void MainWindow::createEditArea()
   group->setGeometry(700, menuBar()->height() + 212, 255, 194);
 
   // Channel B Class A/AB switch:
-  classB = new QSlider(group);
+  classB = new DTSlider(group, CC_CLASS_B);
   classB->setGeometry(26, 40, 32, 28);
-  classB->setMinimum(0);
-  classB->setMaximum(1);
-  classB->setTickPosition(QSlider::NoTicks);
-  connect(classB, SIGNAL(valueChanged(int)), this, SLOT(classBChanged(int)));
+  connect(classB, SIGNAL(valueChanged2(int, int)), this, SLOT(sliderChanged(int, int)));
   label = new QLabel(group);
   label->setText("Class A/B");
   label->setAlignment(Qt::AlignHCenter);
@@ -1195,12 +1124,9 @@ void MainWindow::createEditArea()
   label->setGeometry(10, 68, 64, 20);
 
   // Channel B Pentode/Triode switch:
-  xtodeB = new QSlider(group);
+  xtodeB = new DTSlider(group, CC_XTODE_B);
   xtodeB->setGeometry(196, 40, 32, 28);
-  xtodeB->setMinimum(0);
-  xtodeB->setMaximum(1);
-  xtodeB->setTickPosition(QSlider::NoTicks);
-  connect(xtodeB, SIGNAL(valueChanged(int)), this, SLOT(xtodeBChanged(int)));
+  connect(xtodeB, SIGNAL(valueChanged2(int, int)), this, SLOT(sliderChanged(int, int)));
   label = new QLabel(group);
   label->setText("Pentode");
   label->setAlignment(Qt::AlignHCenter);
@@ -1234,12 +1160,9 @@ void MainWindow::createEditArea()
   label->setGeometry(90, 68, 80, 20);
 
   // Channel B boost switch:
-  boostB = new QSlider(group);
+  boostB = new DTSlider(group, CC_BOOST_B);
   boostB->setGeometry(26, 132, 32, 28);
-  boostB->setMinimum(0);
-  boostB->setMaximum(1);
-  boostB->setTickPosition(QSlider::NoTicks);
-  connect(boostB, SIGNAL(valueChanged(int)), this, SLOT(boostBChanged(int)));
+  connect(boostB, SIGNAL(valueChanged2(int, int)), this, SLOT(sliderChanged(int, int)));
   label = new QLabel(group);
   label->setText("On");
   label->setAlignment(Qt::AlignHCenter);
@@ -1250,12 +1173,9 @@ void MainWindow::createEditArea()
   label->setGeometry(10, 160, 64, 20);
 
   // Channel B PI voltage switch:
-  pivoltB = new QSlider(group);
+  pivoltB = new DTSlider(group, CC_PI_VOLTAGE_B);
   pivoltB->setGeometry(110, 132, 32, 28);
-  pivoltB->setMinimum(0);
-  pivoltB->setMaximum(1);
-  pivoltB->setTickPosition(QSlider::NoTicks);
-  connect(pivoltB, SIGNAL(valueChanged(int)), this, SLOT(pivoltBChanged(int)));
+  connect(pivoltB, SIGNAL(valueChanged2(int, int)), this, SLOT(sliderChanged(int, int)));
   label = new QLabel(group);
   label->setText("PIV High");
   label->setAlignment(Qt::AlignHCenter);
@@ -1266,12 +1186,9 @@ void MainWindow::createEditArea()
   label->setGeometry(94, 160, 64, 20);
 
   // Channel B Cap X/Y switch:
-  capB = new QSlider(group);
+  capB = new DTSlider(group, CC_CAP_TYPE_B);
   capB->setGeometry(196, 132, 32, 28);
-  capB->setMinimum(0);
-  capB->setMaximum(1);
-  capB->setTickPosition(QSlider::NoTicks);
-  connect(capB, SIGNAL(valueChanged(int)), this, SLOT(capBChanged(int)));
+  connect(capB, SIGNAL(valueChanged2(int, int)), this, SLOT(sliderChanged(int,int)));
   label = new QLabel(group);
   label->setText("Tight");
   label->setAlignment(Qt::AlignHCenter);
@@ -1288,12 +1205,10 @@ void MainWindow::createEditArea()
   group->setGeometry(15, menuBar()->height() + 110, 205, 194);
 
   // Channel switch:
-  channel = new QSlider(group);
+  channel = new DTSlider(group, CC_CHANNEL);
   channel->setGeometry(46, 55, 32, 28);
-  channel->setMinimum(0);
-  channel->setMaximum(1);
-  channel->setTickPosition(QSlider::NoTicks);
-  connect(channel, SIGNAL(valueChanged(int)), this, SLOT(channelChanged(int)));
+  channel->setReversed();
+  connect(channel, SIGNAL(valueChanged2(int, int)), this, SLOT(sliderChanged(int, int)));
   label = new QLabel(group);
   label->setText("Channel A");
   label->setAlignment(Qt::AlignHCenter);
@@ -1304,12 +1219,9 @@ void MainWindow::createEditArea()
   label->setGeometry(30, 83, 64, 20);
 
   // Master volume dial:
-  master = new QDial(group);
-  master->setMinimum(0);
-  master->setMaximum(127);
+  master = new DTDial(group, CC_MASTER_VOL);
   master->setGeometry(130, 51, 32, 32);
-  master->setTracking(true);
-  connect(master, SIGNAL(valueChanged(int)), this, SLOT(masterChanged(int)));
+  connect(master, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
   label = new QLabel(group);
   label->setText("Volume");
   label->setAlignment(Qt::AlignHCenter);
@@ -1513,12 +1425,13 @@ void MainWindow::cabAChanged(int value)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// MainWindow::gainAChanged()
+// MainWindow::dialChanged()
 ////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the gain A dial changed event.
-///\param   [in] value: New value of the dial.
+///\brief   Handler for the dial changed event.
+///\param   [in] controlID: Control channel of the dial.
+///\param   [in] value:     New value of the dial.
 ////////////////////////////////////////////////////////////////////////////////
-void MainWindow::gainAChanged(int value)
+void MainWindow::dialChanged(int controlID, int value)
 {
   // Is the UI locked?
   if (blocked)
@@ -1528,19 +1441,20 @@ void MainWindow::gainAChanged(int value)
   sendBlockMessage(true);
 
   // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_GAIN_A, value);
+  sendControlChange(DT_MIDI_CHANNEL, controlID, value);
 
   // Release the user interface:
   sendBlockMessage(false);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// MainWindow::bassAChanged()
+// MainWindow::sliderChanged()
 ////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the bass A dial changed event.
-///\param   [in] value: New value of the dial.
+///\brief   Handler for the slider changed event.
+///\param   [in] controlID: Control channel of the slider.
+///\param   [in] value:     New value of the slider.
 ////////////////////////////////////////////////////////////////////////////////
-void MainWindow::bassAChanged(int value)
+void MainWindow::sliderChanged(int controlID, int value)
 {
   // Is the UI locked?
   if (blocked)
@@ -1550,95 +1464,7 @@ void MainWindow::bassAChanged(int value)
   sendBlockMessage(true);
 
   // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_BASS_A, value);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::middleAChanged()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the middle A dial changed event.
-///\param   [in] value: New value of the dial.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::middleAChanged(int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_MIDDLE_A, value);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::trebleAChanged()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the treble A dial changed event.
-///\param   [in] value: New value of the dial.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::trebleAChanged(int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_TREBLE_A, value);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::presenceAChanged()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the presence A dial changed event.
-///\param   [in] value: New value of the dial.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::presenceAChanged(int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_PRESENCE_A, value);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// MainWindow::volumeAChanged()
-//////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the volume A dial changed event.
-///\param   [in] value: New value of the dial.
-//////////////////////////////////////////////////////////////////////////////
-void MainWindow::volumeAChanged(int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_VOLUME_A, value);
+  sendControlChange(DT_MIDI_CHANNEL, controlID, value);
 
   // Release the user interface:
   sendBlockMessage(false);
@@ -1788,211 +1614,9 @@ void MainWindow::reverbAChanged(int value)
   sendBlockMessage(false);
 }
 
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::reverbDecayAChanged()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the reverb A decay dial changed event.
-///\param   [in] value: New value of the dial.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::reverbDecayAChanged(int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_REV_DECAY_A, value);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
 
 ////////////////////////////////////////////////////////////////////////////////
-// MainWindow::reverbPredelayAChanged()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the reverb A pre delay dial changed event.
-///\param   [in] value: New value of the dial.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::reverbPredelayAChanged(int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_REV_PREDELAY_A, value);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::reverbToneAChanged()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the reverb A tone dial changed event.
-///\param   [in] value: New value of the dial.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::reverbToneAChanged(int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_REV_TONE_A, value);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::reverbMixAChanged()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the reverb A mix dial changed event.
-///\param   [in] value: New value of the dial.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::reverbMixAChanged(int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_REV_MIX_A, value);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::classAChanged()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the class A/AB slider changed event.
-///\param   [in] value: New value of the slider.
-///\remarks The slider value can only be 0 and 1 so it's working as a switch.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::classAChanged(int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_CLASS_A, value ? 127 : 0);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::xtodeAChanged()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the pentode/triode slider changed event.
-///\param   [in] value: New value of the slider.
-///\remarks The slider value can only be 0 and 1 so it's working as a switch.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::xtodeAChanged(int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_XTODE_A, value ? 127 : 0);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::boostAChanged()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the boost on/off slider changed event.
-///\param   [in] value: New value of the slider.
-///\remarks The slider value can only be 0 and 1 so it's working as a switch.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::boostAChanged(int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_BOOST_A, value ? 127 : 0);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::pivoltAChanged()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the PI voltage slider changed event.
-///\param   [in] value: New value of the slider.
-///\remarks The slider value can only be 0 and 1 so it's working as a switch.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::pivoltAChanged(int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_PI_VOLTAGE_A, value ? 127 : 0);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::capAChanged()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the cap X/Y slider changed event.
-///\param   [in] value: New value of the slider.
-///\remarks The slider value can only be 0 and 1 so it's working as a switch.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::capAChanged(int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_CAP_TYPE_A, value ? 127 : 0);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::capAChanged()
+// MainWindow::topolA2toggled()
 ////////////////////////////////////////////////////////////////////////////////
 ///\brief   Handler for the cap X/Y slider changed event.
 ///\param   [in] value: New value of the slider.
@@ -2141,138 +1765,6 @@ void MainWindow::cabBChanged(int value)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// MainWindow::gainBChanged()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the gain B dial changed event.
-///\param   [in] value: New value of the dial.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::gainBChanged(int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_GAIN_B, value);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::bassBChanged()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the bass B dial changed event.
-///\param   [in] value: New value of the dial.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::bassBChanged(int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_BASS_B, value);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::middleBChanged()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the middle B dial changed event.
-///\param   [in] value: New value of the dial.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::middleBChanged(int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_MIDDLE_B, value);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::trebleBChanged()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the treble B dial changed event.
-///\param   [in] value: New value of the dial.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::trebleBChanged(int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_TREBLE_B, value);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::presenceBChanged()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the presence B dial changed event.
-///\param   [in] value: New value of the dial.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::presenceBChanged(int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_PRESENCE_B, value);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::volumeBChanged()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the volume B dial changed event.
-///\param   [in] value: New value of the dial.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::volumeBChanged(int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_VOLUME_B, value);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // MainWindow::voiceB1toggled()
 ////////////////////////////////////////////////////////////////////////////////
 ///\brief   Handler for the voice B1 radio button toggle event.
@@ -2415,209 +1907,6 @@ void MainWindow::reverbBChanged(int value)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// MainWindow::reverbDecayBChanged()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the reverb B decay dial changed event.
-///\param   [in] value: New value of the dial.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::reverbDecayBChanged(int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_REV_DECAY_B, value);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::reverbPredelayBChanged()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the reverb B predelay dial changed event.
-///\param   [in] value: New value of the dial.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::reverbPredelayBChanged(int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_REV_PREDELAY_B, value);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::reverbToneBChanged()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the reverb B tone dial changed event.
-///\param   [in] value: New value of the dial.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::reverbToneBChanged(int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_REV_TONE_B, value);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::reverbMixBChanged()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the reverb B mix dial changed event.
-///\param   [in] value: New value of the dial.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::reverbMixBChanged(int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_REV_MIX_B, value);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::classBChanged()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the class A/AB slider changed event.
-///\param   [in] value: New value of the slider.
-///\remarks The slider value can only be 0 and 1 so it's working as a switch.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::classBChanged(int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_CLASS_B, value ? 127 : 0);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::xtodeBChanged()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the pentode/triode slider changed event.
-///\param   [in] value: New value of the slider.
-///\remarks The slider value can only be 0 and 1 so it's working as a switch.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::xtodeBChanged(int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_XTODE_B, value ? 127 : 0);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::boostBChanged()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the boost on/off slider changed event.
-///\param   [in] value: New value of the slider.
-///\remarks The slider value can only be 0 and 1 so it's working as a switch.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::boostBChanged(int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_BOOST_B, value ? 127 : 0);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::pivoltBChanged()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the PI voltage slider changed event.
-///\param   [in] value: New value of the slider.
-///\remarks The slider value can only be 0 and 1 so it's working as a switch.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::pivoltBChanged(int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_PI_VOLTAGE_B, value ? 127 : 0);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::capBChanged()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the cap X/Y slider changed event.
-///\param   [in] value: New value of the slider.
-///\remarks The slider value can only be 0 and 1 so it's working as a switch.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::capBChanged(int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_CAP_TYPE_B, value ? 127 : 0);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // MainWindow::topolB1toggled()
 ////////////////////////////////////////////////////////////////////////////////
 ///\brief   Handler for the topology B1 radio button toggle event.
@@ -2744,51 +2033,6 @@ void MainWindow::lowVolChanged(int value)
 
   // Send the value:
   sendControlChange(DT_MIDI_CHANNEL, CC_LOWVOLUME, value == Qt::Checked ? 127 : 0);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::capchannelChanged()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for channel slider changed event.
-///\param   [in] value: New value of the slider.
-///\remarks The slider value can only be 0 and 1 so it's working as a switch.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::channelChanged(int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_CHANNEL, value ? 0 : 127);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::masterChanged()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the master dial changed event.
-///\param   [in] value: New value of the dial.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::masterChanged(int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_MASTER_VOL, value);
 
   // Release the user interface:
   sendBlockMessage(false);

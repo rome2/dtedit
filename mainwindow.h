@@ -29,6 +29,8 @@
 
 #include <QtGui>
 #include "dtedit.h"
+#include "dtdial.h"
+#include "dtslider.h"
 #include "mainmidiwindow.h"
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -176,52 +178,22 @@ private slots:
   void cabAChanged(int value);
 
   //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::gainAChanged()
+  // MainWindow::dialChanged()
   //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the gain A dial changed event.
-  ///\param   [in] value: New value of the dial.
+  ///\brief   Handler for the dial changed event.
+  ///\param   [in] controlID: Control channel of the dial.
+  ///\param   [in] value:     New value of the dial.
   //////////////////////////////////////////////////////////////////////////////
-  void gainAChanged(int value);
+  void dialChanged(int controlID, int value);
 
   //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::bassAChanged()
+  // MainWindow::sliderChanged()
   //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the bass A dial changed event.
-  ///\param   [in] value: New value of the dial.
+  ///\brief   Handler for the slider changed event.
+  ///\param   [in] controlID: Control channel of the slider.
+  ///\param   [in] value:     New value of the slider.
   //////////////////////////////////////////////////////////////////////////////
-  void bassAChanged(int value);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::middleAChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the middle A dial changed event.
-  ///\param   [in] value: New value of the dial.
-  //////////////////////////////////////////////////////////////////////////////
-  void middleAChanged(int value);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::trebleAChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the treble A dial changed event.
-  ///\param   [in] value: New value of the dial.
-  //////////////////////////////////////////////////////////////////////////////
-  void trebleAChanged(int value);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::presenceAChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the presence A dial changed event.
-  ///\param   [in] value: New value of the dial.
-  //////////////////////////////////////////////////////////////////////////////
-  void presenceAChanged(int value);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::volumeAChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the volume A dial changed event.
-  ///\param   [in] value: New value of the dial.
-  //////////////////////////////////////////////////////////////////////////////
-  void volumeAChanged(int value);
+  void sliderChanged(int controlID, int value);
 
   //////////////////////////////////////////////////////////////////////////////
   // MainWindow::voiceA1toggled()
@@ -272,83 +244,6 @@ private slots:
   void reverbAChanged(int value);
 
   //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::reverbDecayAChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the reverb A decay dial changed event.
-  ///\param   [in] value: New value of the dial.
-  //////////////////////////////////////////////////////////////////////////////
-  void reverbDecayAChanged(int value);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::reverbPredelayAChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the reverb A pre delay dial changed event.
-  ///\param   [in] value: New value of the dial.
-  //////////////////////////////////////////////////////////////////////////////
-  void reverbPredelayAChanged(int value);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::reverbToneAChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the reverb A tone dial changed event.
-  ///\param   [in] value: New value of the dial.
-  //////////////////////////////////////////////////////////////////////////////
-  void reverbToneAChanged(int value);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::reverbMixAChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the reverb A mix dial changed event.
-  ///\param   [in] value: New value of the dial.
-  //////////////////////////////////////////////////////////////////////////////
-  void reverbMixAChanged(int value);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::classAChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the class A/AB slider changed event.
-  ///\param   [in] value: New value of the slider.
-  ///\remarks The slider value can only be 0 and 1 so it's working as a switch.
-  //////////////////////////////////////////////////////////////////////////////
-  void classAChanged(int value);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::xtodeAChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the pentode/triode slider changed event.
-  ///\param   [in] value: New value of the slider.
-  ///\remarks The slider value can only be 0 and 1 so it's working as a switch.
-  //////////////////////////////////////////////////////////////////////////////
-  void xtodeAChanged(int value);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::boostAChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the boost on/off slider changed event.
-  ///\param   [in] value: New value of the slider.
-  ///\remarks The slider value can only be 0 and 1 so it's working as a switch.
-  //////////////////////////////////////////////////////////////////////////////
-  void boostAChanged(int value);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::pivoltAChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the PI voltage slider changed event.
-  ///\param   [in] value: New value of the slider.
-  ///\remarks The slider value can only be 0 and 1 so it's working as a switch.
-  //////////////////////////////////////////////////////////////////////////////
-  void pivoltAChanged(int value);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::capAChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the cap X/Y slider changed event.
-  ///\param   [in] value: New value of the slider.
-  ///\remarks The slider value can only be 0 and 1 so it's working as a switch.
-  //////////////////////////////////////////////////////////////////////////////
-  void capAChanged(int value);
-
-  //////////////////////////////////////////////////////////////////////////////
   // MainWindow::topolA1toggled()
   //////////////////////////////////////////////////////////////////////////////
   ///\brief   Handler for the topology A1 radio button toggle event.
@@ -395,54 +290,6 @@ private slots:
   ///\param   [in] value: Index of the selected item.
   //////////////////////////////////////////////////////////////////////////////
   void cabBChanged(int value);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::gainBChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the gain B dial changed event.
-  ///\param   [in] value: New value of the dial.
-  //////////////////////////////////////////////////////////////////////////////
-  void gainBChanged(int value);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::bassBChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the bass B dial changed event.
-  ///\param   [in] value: New value of the dial.
-  //////////////////////////////////////////////////////////////////////////////
-  void bassBChanged(int value);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::middleBChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the middle B dial changed event.
-  ///\param   [in] value: New value of the dial.
-  //////////////////////////////////////////////////////////////////////////////
-  void middleBChanged(int value);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::trebleBChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the treble B dial changed event.
-  ///\param   [in] value: New value of the dial.
-  //////////////////////////////////////////////////////////////////////////////
-  void trebleBChanged(int value);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::presenceBChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the presence B dial changed event.
-  ///\param   [in] value: New value of the dial.
-  //////////////////////////////////////////////////////////////////////////////
-  void presenceBChanged(int value);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::volumeBChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the volume B dial changed event.
-  ///\param   [in] value: New value of the dial.
-  //////////////////////////////////////////////////////////////////////////////
-  void volumeBChanged(int value);
 
   //////////////////////////////////////////////////////////////////////////////
   // MainWindow::voiceB1toggled()
@@ -493,83 +340,6 @@ private slots:
   void reverbBChanged(int value);
 
   //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::reverbDecayBChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the reverb B decay dial changed event.
-  ///\param   [in] value: New value of the dial.
-  //////////////////////////////////////////////////////////////////////////////
-  void reverbDecayBChanged(int value);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::reverbPredelayBChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the reverb B predelay dial changed event.
-  ///\param   [in] value: New value of the dial.
-  //////////////////////////////////////////////////////////////////////////////
-  void reverbPredelayBChanged(int value);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::reverbToneBChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the reverb B tone dial changed event.
-  ///\param   [in] value: New value of the dial.
-  //////////////////////////////////////////////////////////////////////////////
-  void reverbToneBChanged(int value);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::reverbMixBChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the reverb B mix dial changed event.
-  ///\param   [in] value: New value of the dial.
-  //////////////////////////////////////////////////////////////////////////////
-  void reverbMixBChanged(int value);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::classBChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the class A/AB slider changed event.
-  ///\param   [in] value: New value of the slider.
-  ///\remarks The slider value can only be 0 and 1 so it's working as a switch.
-  //////////////////////////////////////////////////////////////////////////////
-  void classBChanged(int value);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::xtodeBChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the pentode/triode slider changed event.
-  ///\param   [in] value: New value of the slider.
-  ///\remarks The slider value can only be 0 and 1 so it's working as a switch.
-  //////////////////////////////////////////////////////////////////////////////
-  void xtodeBChanged(int value);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::boostBChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the boost on/off slider changed event.
-  ///\param   [in] value: New value of the slider.
-  ///\remarks The slider value can only be 0 and 1 so it's working as a switch.
-  //////////////////////////////////////////////////////////////////////////////
-  void boostBChanged(int value);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::pivoltBChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the PI voltage slider changed event.
-  ///\param   [in] value: New value of the slider.
-  ///\remarks The slider value can only be 0 and 1 so it's working as a switch.
-  //////////////////////////////////////////////////////////////////////////////
-  void pivoltBChanged(int value);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::capBChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the cap X/Y slider changed event.
-  ///\param   [in] value: New value of the slider.
-  ///\remarks The slider value can only be 0 and 1 so it's working as a switch.
-  //////////////////////////////////////////////////////////////////////////////
-  void capBChanged(int value);
-
-  //////////////////////////////////////////////////////////////////////////////
   // MainWindow::topolB1toggled()
   //////////////////////////////////////////////////////////////////////////////
   ///\brief   Handler for the topology B1 radio button toggle event.
@@ -617,85 +387,68 @@ private slots:
   //////////////////////////////////////////////////////////////////////////////
   void lowVolChanged(int value);
 
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::channelChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for channel slider changed event.
-  ///\param   [in] value: New value of the slider.
-  ///\remarks The slider value can only be 0 and 1 so it's working as a switch.
-  //////////////////////////////////////////////////////////////////////////////
-  void channelChanged(int value);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::masterChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the master dial changed event.
-  ///\param   [in] value: New value of the dial.
-  //////////////////////////////////////////////////////////////////////////////
-  void masterChanged(int value);
-
 private:
 
   //////////////////////////////////////////////////////////////////////////////
   // Member:
   QComboBox*    ampA;            ///> Channel A amp model selector.
   QComboBox*    cabA;            ///> Channel A cabinet selector.
-  QDial*        gainA;           ///> Channel A gain dial.
-  QDial*        bassA;           ///> Channel A bass dial.
-  QDial*        middleA;         ///> Channel A middle dial.
-  QDial*        trebleA;         ///> Channel A treble dial.
-  QDial*        presenceA;       ///> Channel A presence dial.
-  QDial*        volumeA;         ///> Channel A volume dial.
+  DTDial*       gainA;           ///> Channel A gain dial.
+  DTDial*       bassA;           ///> Channel A bass dial.
+  DTDial*       middleA;         ///> Channel A middle dial.
+  DTDial*       trebleA;         ///> Channel A treble dial.
+  DTDial*       presenceA;       ///> Channel A presence dial.
+  DTDial*       volumeA;         ///> Channel A volume dial.
   QCheckBox*    reverbBypassA;   ///> Reverb A enabled switch.
   QComboBox*    reverbA;         ///> Reverb A type selector.
-  QDial*        reverbDecayA;    ///> Reverb A decay dial.
-  QDial*        reverbPredelayA; ///> Reverb A pre delay dial.
-  QDial*        reverbToneA;     ///> Reverb A tone dial.
-  QDial*        reverbMixA;      ///> Reverb A mix dial.
+  DTDial*       reverbDecayA;    ///> Reverb A decay dial.
+  DTDial*       reverbPredelayA; ///> Reverb A pre delay dial.
+  DTDial*       reverbToneA;     ///> Reverb A tone dial.
+  DTDial*       reverbMixA;      ///> Reverb A mix dial.
   QRadioButton* voiceA1;         ///> Channel A voice I select.
   QRadioButton* voiceA2;         ///> Channel A voice II select.
   QRadioButton* voiceA3;         ///> Channel A voice III select.
   QRadioButton* voiceA4;         ///> Channel A voice IV select.
-  QSlider*      classA;          ///> Channel A, Class A/B switch.
-  QSlider*      xtodeA;          ///> Channel A Pentode / triode switch.
+  DTSlider*     classA;          ///> Channel A, Class A/B switch.
+  DTSlider*     xtodeA;          ///> Channel A Pentode / triode switch.
   QRadioButton* topolA1;         ///> Channel A topology I select.
   QRadioButton* topolA2;         ///> Channel A topology II select.
   QRadioButton* topolA3;         ///> Channel A topology III select.
   QRadioButton* topolA4;         ///> Channel A topology IV select.
-  QSlider*      boostA;          ///> Channel A tube boost on/off.
-  QSlider*      pivoltA;         ///> Channel A phase inverter switch.
-  QSlider*      capA;            ///> Channel A cap X, cap Y switch.
+  DTSlider*      boostA;          ///> Channel A tube boost on/off.
+  DTSlider*      pivoltA;         ///> Channel A phase inverter switch.
+  DTSlider*     capA;            ///> Channel A cap X, cap Y switch.
   QComboBox*    ampB;            ///> Channel B amp model selector.
   QComboBox*    cabB;            ///> Channel B cabinet selector.
-  QDial*        gainB;           ///> Channel B gain dial.
-  QDial*        bassB;           ///> Channel B bass dial.
-  QDial*        middleB;         ///> Channel B middle dial.
-  QDial*        trebleB;         ///> Channel B treble dial.
-  QDial*        presenceB;       ///> Channel B presence dial.
-  QDial*        volumeB;         ///> Channel B volume dial.
+  DTDial*       gainB;           ///> Channel B gain dial.
+  DTDial*       bassB;           ///> Channel B bass dial.
+  DTDial*       middleB;         ///> Channel B middle dial.
+  DTDial*       trebleB;         ///> Channel B treble dial.
+  DTDial*       presenceB;       ///> Channel B presence dial.
+  DTDial*       volumeB;         ///> Channel B volume dial.
   QCheckBox*    reverbBypassB;   ///> Reverb B enabled switch.
   QComboBox*    reverbB;         ///> Reverb B type selector.
-  QDial*        reverbDecayB;    ///> Reverb B decay dial.
-  QDial*        reverbPredelayB; ///> Reverb B pre delay dial.
-  QDial*        reverbToneB;     ///> Reverb B tone dial.
-  QDial*        reverbMixB;      ///> Reverb B mix dial.
+  DTDial*       reverbDecayB;    ///> Reverb B decay dial.
+  DTDial*       reverbPredelayB; ///> Reverb B pre delay dial.
+  DTDial*       reverbToneB;     ///> Reverb B tone dial.
+  DTDial*       reverbMixB;      ///> Reverb B mix dial.
   QRadioButton* voiceB1;         ///> Channel B voice I select.
   QRadioButton* voiceB2;         ///> Channel B voice II select.
   QRadioButton* voiceB3;         ///> Channel B voice III select.
   QRadioButton* voiceB4;         ///> Channel B voice IV select.
-  QSlider*      classB;          ///> Channel B, Class A/B switch.
-  QSlider*      xtodeB;          ///> Channel B Pentode / triode switch.
+  DTSlider*     classB;          ///> Channel B, Class A/B switch.
+  DTSlider*     xtodeB;          ///> Channel B Pentode / triode switch.
   QRadioButton* topolB1;         ///> Channel B topology I select.
   QRadioButton* topolB2;         ///> Channel B topology II select.
   QRadioButton* topolB3;         ///> Channel B topology III select.
   QRadioButton* topolB4;         ///> Channel B topology IV select.
-  QSlider*      boostB;          ///> Channel B tube boost on/off.
-  QSlider*      pivoltB;         ///> Channel B phase inverter switch.
-  QSlider*      capB;            ///> Channel B cap X, cap Y switch.
+  DTSlider*     boostB;          ///> Channel B tube boost on/off.
+  DTSlider*     pivoltB;         ///> Channel B phase inverter switch.
+  DTSlider*     capB;            ///> Channel B cap X, cap Y switch.
   QComboBox*    mic;             ///> Master XLR mic simulation.
   QCheckBox*    lowVol;          ///> Low volume switch.
-  QSlider*      channel;         ///> Channel A/B switch.
-  QDial*        master;          ///> Master volume.
+  DTSlider*     channel;         ///> Channel A/B switch.
+  DTDial*       master;          ///> Master volume.
   QAction*      openAction;      ///> File->Open.
   QAction*      saveAction;      ///> File->Save.
   QAction*      saveAsAction;    ///> File->Save as.

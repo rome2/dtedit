@@ -22,7 +22,9 @@ HEADERS  += mainwindow.h \
     setupdialog.h \
     aboutdialog.h \
     dtedit.h \
-    mainmidiwindow.h
+    mainmidiwindow.h \
+    dtdial.h \
+    dtslider.h
 
 win* {
     DEFINES += __WINDOWS_MM__
