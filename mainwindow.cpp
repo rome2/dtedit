@@ -164,165 +164,276 @@ void MainWindow::controlChangeReceived(unsigned char channel, unsigned char cont
   if (blocked)
     return;
 
-  // Lock the GUI:
-  blocked = true;
-
+  bool oldState;
   switch (controlNumber)
   {
   case CC_AMP_A:
+    oldState = ampA->blockSignals(true);
     ampA->setCurrentIndex(value);
+    ampA->blockSignals(oldState);
     break;
   case CC_CAB_A:
+    oldState = cabA->blockSignals(true);
     cabA->setCurrentIndex(value);
+    cabA->blockSignals(oldState);
     break;
   case CC_GAIN_A:
+    oldState = gainA->blockSignals(true);
     gainA->setValue(value);
+    gainA->blockSignals(oldState);
     break;
   case CC_BASS_A:
+    oldState = bassA->blockSignals(true);
     bassA->setValue(value);
+    bassA->blockSignals(oldState);
     break;
   case CC_MIDDLE_A:
+    oldState = middleA->blockSignals(true);
     middleA->setValue(value);
+    middleA->blockSignals(oldState);
     break;
   case CC_TREBLE_A:
+    oldState = trebleA->blockSignals(true);
     trebleA->setValue(value);
+    trebleA->blockSignals(oldState);
     break;
   case CC_PRESENCE_A:
+    oldState = presenceA->blockSignals(true);
     presenceA->setValue(value);
+    presenceA->blockSignals(oldState);
     break;
   case CC_VOLUME_A:
+    oldState = volumeA->blockSignals(true);
     volumeA->setValue(value);
+    volumeA->blockSignals(oldState);
     break;
   case CC_VOICE_A:
+    oldState = voiceA1->blockSignals(true);
     voiceA1->setChecked(value == 0);
+    voiceA1->blockSignals(oldState);
+    oldState = voiceA2->blockSignals(true);
     voiceA2->setChecked(value == 1);
+    voiceA2->blockSignals(oldState);
+    oldState = voiceA3->blockSignals(true);
     voiceA3->setChecked(value == 2);
+    voiceA3->blockSignals(oldState);
+    oldState = voiceA4->blockSignals(true);
     voiceA4->setChecked(value == 3);
+    voiceA4->blockSignals(oldState);
     break;
   case CC_REV_BYPASS_A:
+    oldState = reverbBypassA->blockSignals(true);
     reverbBypassA->setChecked(value >= 64);
+    reverbBypassA->blockSignals(oldState);
     break;
   case CC_REV_TYPE_A:
+    oldState = reverbA->blockSignals(true);
     reverbA->setCurrentIndex(value);
+    reverbA->blockSignals(oldState);
     break;
   case CC_REV_DECAY_A:
+    oldState = reverbDecayA->blockSignals(true);
     reverbDecayA->setValue(value);
+    reverbDecayA->blockSignals(oldState);
     break;
   case CC_REV_PREDELAY_A:
+    oldState = reverbPredelayA->blockSignals(true);
     reverbPredelayA->setValue(value);
+    reverbPredelayA->blockSignals(oldState);
     break;
   case CC_REV_TONE_A:
+    oldState = reverbToneA->blockSignals(true);
     reverbToneA->setValue(value);
+    reverbToneA->blockSignals(oldState);
     break;
   case CC_REV_MIX_A:
+    oldState = reverbMixA->blockSignals(true);
     reverbMixA->setValue(value);
+    reverbMixA->blockSignals(oldState);
     break;
   case CC_CLASS_A:
+    oldState = classA->blockSignals(true);
     classA->setValue(value >= 64 ? 1 : 0);
+    classA->blockSignals(oldState);
     break;
   case CC_TOPOL_A:
+    oldState = topolA1->blockSignals(true);
     topolA1->setChecked(value == 0);
+    topolA1->blockSignals(oldState);
+    oldState = topolA2->blockSignals(true);
     topolA2->setChecked(value == 1);
+    topolA2->blockSignals(oldState);
+    oldState = topolA3->blockSignals(true);
     topolA3->setChecked(value == 2);
+    topolA3->blockSignals(oldState);
+    oldState = topolA4->blockSignals(true);
     topolA4->setChecked(value == 3);
+    topolA4->blockSignals(oldState);
     break;
   case CC_XTODE_A:
+    oldState = xtodeA->blockSignals(true);
     xtodeA->setValue(value >= 64 ? 1 : 0);
+    xtodeA->blockSignals(oldState);
     break;
   case CC_BOOST_A:
+    oldState = boostA->blockSignals(true);
     boostA->setValue(value >= 64 ? 1 : 0);
+    boostA->blockSignals(oldState);
     break;
   case CC_PI_VOLTAGE_A:
+    oldState = pivoltA->blockSignals(true);
     pivoltA->setValue(value >= 64 ? 1 : 0);
+    pivoltA->blockSignals(oldState);
     break;
   case CC_CAP_TYPE_A:
+    oldState = capA->blockSignals(true);
     capA->setValue(value >= 64 ? 1 : 0);
+    capA->blockSignals(oldState);
     break;
   case CC_AMP_B:
+    oldState = ampB->blockSignals(true);
     ampB->setCurrentIndex(value);
+    ampB->blockSignals(oldState);
     break;
   case CC_CAB_B:
+    oldState = cabB->blockSignals(true);
     cabB->setCurrentIndex(value);
+    cabB->blockSignals(oldState);
     break;
   case CC_GAIN_B:
+    oldState = gainB->blockSignals(true);
     gainB->setValue(value);
+    gainB->blockSignals(oldState);
     break;
   case CC_BASS_B:
+    oldState = bassB->blockSignals(true);
     bassB->setValue(value);
+    bassB->blockSignals(oldState);
     break;
   case CC_MIDDLE_B:
+    oldState = middleB->blockSignals(true);
     middleB->setValue(value);
+    middleB->blockSignals(oldState);
     break;
   case CC_TREBLE_B:
+    oldState = trebleB->blockSignals(true);
     trebleB->setValue(value);
+    trebleB->blockSignals(oldState);
     break;
   case CC_PRESENCE_B:
+    oldState = presenceB->blockSignals(true);
     presenceB->setValue(value);
+    presenceB->blockSignals(oldState);
     break;
   case CC_VOLUME_B:
+    oldState = volumeB->blockSignals(true);
     volumeB->setValue(value);
+    volumeB->blockSignals(oldState);
     break;
   case CC_VOICE_B:
+    oldState = voiceB1->blockSignals(true);
     voiceB1->setChecked(value == 0);
+    voiceB1->blockSignals(oldState);
+    oldState = voiceB2->blockSignals(true);
     voiceB2->setChecked(value == 1);
+    voiceB2->blockSignals(oldState);
+    oldState = voiceB3->blockSignals(true);
     voiceB3->setChecked(value == 2);
+    voiceB3->blockSignals(oldState);
+    oldState = voiceB4->blockSignals(true);
     voiceB4->setChecked(value == 3);
+    voiceB4->blockSignals(oldState);
     break;
   case CC_REV_BYPASS_B:
+    oldState = reverbBypassB->blockSignals(true);
     reverbBypassB->setChecked(value >= 64);
+    reverbBypassB->blockSignals(oldState);
     break;
   case CC_REV_TYPE_B:
+    oldState = reverbB->blockSignals(true);
     reverbB->setCurrentIndex(value);
+    reverbB->blockSignals(oldState);
     break;
   case CC_REV_DECAY_B:
+    oldState = reverbDecayB->blockSignals(true);
     reverbDecayB->setValue(value);
+    reverbDecayB->blockSignals(oldState);
     break;
   case CC_REV_PREDELAY_B:
+    oldState = reverbPredelayB->blockSignals(true);
     reverbPredelayB->setValue(value);
+    reverbPredelayB->blockSignals(oldState);
     break;
   case CC_REV_TONE_B:
+    oldState = reverbToneB->blockSignals(true);
     reverbToneB->setValue(value);
+    reverbToneB->blockSignals(oldState);
     break;
   case CC_REV_MIX_B:
+    oldState = reverbMixB->blockSignals(true);
     reverbMixB->setValue(value);
+    reverbMixB->blockSignals(oldState);
     break;
   case CC_CLASS_B:
+    oldState = classB->blockSignals(true);
     classB->setValue(value >= 64 ? 1 : 0);
+    classB->blockSignals(oldState);
     break;
   case CC_TOPOL_B:
+    oldState = topolB1->blockSignals(true);
     topolB1->setChecked(value == 0);
+    topolB1->blockSignals(oldState);
+    oldState = topolB2->blockSignals(true);
     topolB2->setChecked(value == 1);
+    topolB2->blockSignals(oldState);
+    oldState = topolB3->blockSignals(true);
     topolB3->setChecked(value == 2);
+    topolB3->blockSignals(oldState);
+    oldState = topolB4->blockSignals(true);
     topolB4->setChecked(value == 3);
+    topolB4->blockSignals(oldState);
     break;
   case CC_XTODE_B:
+    oldState = xtodeB->blockSignals(true);
     xtodeB->setValue(value >= 64 ? 1 : 0);
+    xtodeB->blockSignals(oldState);
     break;
   case CC_BOOST_B:
+    oldState = boostB->blockSignals(true);
     boostB->setValue(value >= 64 ? 1 : 0);
+    boostB->blockSignals(oldState);
     break;
   case CC_PI_VOLTAGE_B:
+    oldState = pivoltB->blockSignals(true);
     pivoltB->setValue(value >= 64 ? 1 : 0);
+    pivoltB->blockSignals(oldState);
     break;
   case CC_CAP_TYPE_B:
+    oldState = capB->blockSignals(true);
     capB->setValue(value >= 64 ? 1 : 0);
+    capB->blockSignals(oldState);
     break;
   case CC_XLR_MIC:
+    oldState = mic->blockSignals(true);
     mic->setCurrentIndex(value);
+    mic->blockSignals(oldState);
     break;
   case CC_LOWVOLUME:
+    oldState = lowVol->blockSignals(true);
     lowVol->setChecked(value >= 64);
+    lowVol->blockSignals(oldState);
     break;
   case CC_CHANNEL:
+    oldState = this->channel->blockSignals(true);
     this->channel->setValue(value >= 64 ? 0 : 1);
+    this->channel->blockSignals(oldState);
     break;
   case CC_MASTER_VOL:
+    oldState = master->blockSignals(true);
     master->setValue(value);
+    master->blockSignals(oldState);
     break;
   }
-
-  // Unlock the GUI:
-  blocked = false;
 }
 
 void MainWindow::readFile(const QString& fileName)
@@ -1361,6 +1472,9 @@ void MainWindow::setupMIDI()
     if (QMessageBox::question(this, tr("MIDI error"), tr("There was an error while establishing the MIDI connection to the device.\n\nWould you like to check the configuration?"), QMessageBox::Yes, QMessageBox::No) != QMessageBox::Yes)
       break;
   }
+
+  // Force unblock:
+  blocked = false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

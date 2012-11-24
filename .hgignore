@@ -12,3 +12,4 @@ setup/database/obj/*
 *.suo
 releases/*
 object_script.*
+*.user.*

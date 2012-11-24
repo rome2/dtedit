@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <Product Id="*" UpgradeCode="D93C448A-B08E-4A84-BDCA-E5FCA54A3F46" Version="1.0.0.1" Language="1033" Name="DT Edit" Manufacturer="Rolf Meyerhoff">
+  <Product Id="*" UpgradeCode="D93C448A-B08E-4A84-BDCA-E5FCA54A3F46" Version="1.0.0.2" Language="1033" Name="DT Edit" Manufacturer="Rolf Meyerhoff">
     <Package Keywords="Installer" Description="DT Edit Installer" Manufacturer="Rolf Meyerhoff" InstallerVersion="300" Compressed="yes" InstallScope="perMachine" />
     <Media Id="1" Cabinet="dtedit.cab" EmbedCab="yes" />
 

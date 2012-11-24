@@ -352,7 +352,8 @@ protected:
       return;
 
     // Send our message:
-    emit valueChanged2(controlID, value());
+    if (!signalsBlocked())
+      emit valueChanged2(controlID, value());
   }
 
 private:

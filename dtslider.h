@@ -126,10 +126,13 @@ protected:
       return;
 
     // Send our message:
-    if (reversed)
-      emit valueChanged2(controlID, value() ? 0 : 127);
-    else
-      emit valueChanged2(controlID, value() ? 127 : 0);
+    if (!signalsBlocked())
+    {
+      if (reversed)
+        emit valueChanged2(controlID, value() ? 0 : 127);
+      else
+        emit valueChanged2(controlID, value() ? 127 : 0);
+    }
   }
 
 private:

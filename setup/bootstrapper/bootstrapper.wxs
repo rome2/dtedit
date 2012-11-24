@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:bal="http://schemas.microsoft.com/wix/BalExtension">
-	<Bundle Name="DT Edit" Version="1.0.0.1" Manufacturer="Rolf Meyerhoff" AboutUrl="http://code.google.com/p/dtedit/" IconSourceFile="..\..\images\dtedit.ico" UpgradeCode="d5506777-792b-481d-9aeb-c773806e23b6">
+	<Bundle Name="DT Edit" Version="1.0.0.2" Manufacturer="Rolf Meyerhoff" AboutUrl="http://code.google.com/p/dtedit/" IconSourceFile="..\..\images\dtedit.ico" UpgradeCode="d5506777-792b-481d-9aeb-c773806e23b6">
 
     <!-- Define the list of chained packages: -->
     <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
