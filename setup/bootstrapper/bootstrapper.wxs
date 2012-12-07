@@ -9,7 +9,7 @@
 
     <!-- Define the list of chained packages: -->
     <Chain>
-      <MsiPackage SourceFile="..\bin\dtedit.msi">
+      <MsiPackage SourceFile="..\..\release\dtedit.msi">
         <MsiProperty Name='INSTALLDIR' Value='[InstallFolder]' />
       </MsiPackage>
 		</Chain>

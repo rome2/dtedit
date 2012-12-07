@@ -162,6 +162,14 @@ private slots:
   void setupMIDI();
 
   //////////////////////////////////////////////////////////////////////////////
+  // MainWindow::ignoreMasterChange()
+  //////////////////////////////////////////////////////////////////////////////
+  ///\brief   Handler for the ignore master menu entry checked changed event.
+  ///\param   [in] checked: New checked state of the menu entry.
+  //////////////////////////////////////////////////////////////////////////////
+  void ignoreMasterChanged(bool checked);
+
+  //////////////////////////////////////////////////////////////////////////////
   // MainWindow::ampAChanged()
   //////////////////////////////////////////////////////////////////////////////
   ///\brief   Handler for the amp A combo box selection changed event.
@@ -455,6 +463,7 @@ private:
   QAction*      quitAction;      ///> File->Quit action.
   QAction*      setupAction;     ///> Options->Setup action.
   QAction*      defaultsAction;  ///> Options->Load defaults on amp change.
+  QAction*      masterAction;    ///> Options->Ignore master.
   QAction*      aboutAction;     ///> Help->About action.
   QAction*      aboutQtAction;   ///> Help->About Qt action.
   QMenu*        fileMenu;        ///> File main menu item.

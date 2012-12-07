@@ -66,11 +66,15 @@ MainWindow::MainWindow(QWidget *parent) :
 
   // Load settings:
   QSettings settings;
-  x = settings.value("mainwindow/x",      QVariant(x)).toInt();
-  y = settings.value("mainwindow/y",      QVariant(y)).toInt();
+  x = settings.value("mainwindow/x", QVariant(x)).toInt();
+  y = settings.value("mainwindow/y", QVariant(y)).toInt();
   midiInName  = settings.value("MIDI/inputName",  QVariant("")).toString();
   midiOutName = settings.value("MIDI/outputName", QVariant("")).toString();
+
+  // Update UI:
   defaultsAction->setChecked(settings.value("misc/loadDefaults", QVariant(true)).toBool());
+  masterAction->setChecked(settings.value("misc/ignoreMaster", QVariant(true)).toBool());
+  master->setEnabled(!masterAction->isChecked());
 
   // Place window:
   setGeometry(x, y, w, h);
@@ -113,6 +117,7 @@ void MainWindow::closeEvent(QCloseEvent* e)
 
   // Save editor state:
   settings.setValue("misc/loadDefaults", defaultsAction->isChecked());
+  settings.setValue("misc/ignoreMaster", masterAction->isChecked());
 
   // allow closing:
   e->accept();
@@ -429,9 +434,12 @@ void MainWindow::controlChangeReceived(unsigned char channel, unsigned char cont
     this->channel->blockSignals(oldState);
     break;
   case CC_MASTER_VOL:
-    oldState = master->blockSignals(true);
-    master->setValue(value);
-    master->blockSignals(oldState);
+    if (!masterAction->isChecked())
+    {
+      oldState = master->blockSignals(true);
+      master->setValue(value);
+      master->blockSignals(oldState);
+    }
     break;
   }
 }
@@ -642,6 +650,12 @@ void MainWindow::createActions()
   defaultsAction->setStatusTip(tr("Load default power amp and cab setting when switching amp models"));
   defaultsAction->setCheckable(true);
 
+  // Options->Ignore master:
+  masterAction = new QAction(tr("&Ignore master"), this);
+  masterAction->setStatusTip(tr("Ignore master knob and setting changes."));
+  masterAction->setCheckable(true);
+  connect(masterAction, SIGNAL(toggled(bool)), this, SLOT(ignoreMasterChanged(bool)));
+
   // Help->About:
   aboutAction = new QAction(QIcon(":/images/about.png"), tr("&About..."), this);
   aboutAction->setStatusTip(tr("Show the application's About box"));
@@ -673,6 +687,7 @@ void MainWindow::createMenu()
   // Options menu:
   optionsMenu = menuBar()->addMenu(tr("&Options"));
   optionsMenu->addAction(defaultsAction);
+  optionsMenu->addAction(masterAction);
   optionsMenu->addSeparator();
   optionsMenu->addAction(setupAction);
 
@@ -1475,6 +1490,18 @@ void MainWindow::setupMIDI()
 
   // Force unblock:
   blocked = false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// MainWindow::ignoreMasterChange()
+////////////////////////////////////////////////////////////////////////////////
+///\brief   Handler for the ignore master menu entry checked changed event.
+///\param   [in] checked: New checked state of the menu entry.
+////////////////////////////////////////////////////////////////////////////////
+void MainWindow::ignoreMasterChanged(bool checked)
+{
+  // Enable/disable master knob:
+  master->setEnabled(!checked);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
