@@ -28,9 +28,12 @@
 #define __MAINWINDOW_H_INCLUDED__
 
 #include <QtGui>
+#include "qimagedial.h"
+#include "qimagetoggle.h"
+#include "qimagebutton.h"
+#include "qimagetoggle4.h"
+#include "qimageled.h"
 #include "dtedit.h"
-#include "dtdial.h"
-#include "dtslider.h"
 #include "mainmidiwindow.h"
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -80,6 +83,14 @@ protected:
   void showEvent(QShowEvent* e);
 
   //////////////////////////////////////////////////////////////////////////////
+  // MainWindow::paintEvent()
+  //////////////////////////////////////////////////////////////////////////////
+  ///\brief   Message handler for the paint event.
+  ///\param   [in] e: Description of the event.
+  //////////////////////////////////////////////////////////////////////////////
+  void paintEvent(QPaintEvent* e);
+
+  //////////////////////////////////////////////////////////////////////////////
   // MainWindow::controlChangeReceived()
   //////////////////////////////////////////////////////////////////////////////
   ///\brief   This is called when a new control change message arrives.
@@ -90,22 +101,6 @@ protected:
   virtual void controlChangeReceived(unsigned char channel, unsigned char controlNumber, unsigned char value);
 
 private:
-
-  void readFile(const QString& fileName);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::createActions()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Create all required actions.
-  //////////////////////////////////////////////////////////////////////////////
-  void createActions();
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::createMenu()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Create the main menu.
-  //////////////////////////////////////////////////////////////////////////////
-  void createMenu();
 
   //////////////////////////////////////////////////////////////////////////////
   // MainWindow::createEditArea()
@@ -138,36 +133,57 @@ private:
 private slots:
 
   //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::exitApplication()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the Exit-Application signal.
-  ///\remarks Closes the window and quits the application.
-  //////////////////////////////////////////////////////////////////////////////
-  void exitApplication();
-
-  //////////////////////////////////////////////////////////////////////////////
   // MainWindow::about()
   //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the Help->About signal.
+  ///\brief   Handler for the about button signal.
+  ///\param   [in] sender: The sending control.
   ///\remarks Shows an about box with informations about this application.
   //////////////////////////////////////////////////////////////////////////////
-  void about();
+  void about(QImageButton* sender);
 
   //////////////////////////////////////////////////////////////////////////////
   // MainWindow::setupMIDI()
   //////////////////////////////////////////////////////////////////////////////
   ///\brief   Handler for the File->Setup signal.
+  ///\param   [in] sender: The sending control.
   ///\remarks Shows the MIDI setup dialog.
   //////////////////////////////////////////////////////////////////////////////
-  void setupMIDI();
+  void setupMIDI(QImageButton* sender);
 
   //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::ignoreMasterChange()
+  // MainWindow::rotaryChanged()
   //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the ignore master menu entry checked changed event.
-  ///\param   [in] checked: New checked state of the menu entry.
+  ///\brief   Handler for the dial changed event.
+  ///\param   [in] sender: The sending control.
+  ///\param   [in] newVal: The new value.
   //////////////////////////////////////////////////////////////////////////////
-  void ignoreMasterChanged(bool checked);
+  void rotaryChanged(QImageDial* sender, double newVal);
+
+  //////////////////////////////////////////////////////////////////////////////
+  // MainWindow::rotaryReleased()
+  //////////////////////////////////////////////////////////////////////////////
+  ///\brief   Handler for the dial released event.
+  ///\param   [in] sender: The sending control.
+  //////////////////////////////////////////////////////////////////////////////
+  void rotaryReleased(QImageDial* sender);
+
+  //////////////////////////////////////////////////////////////////////////////
+  // MainWindow::toggleChanged()
+  //////////////////////////////////////////////////////////////////////////////
+  ///\brief   Handler for the toggle changed event.
+  ///\param   [in] sender: The sending control.
+  ///\param   [in] newVal: The new value.
+  //////////////////////////////////////////////////////////////////////////////
+  void toggleChanged(QImageToggle* sender, bool newVal);
+
+  //////////////////////////////////////////////////////////////////////////////
+  // MainWindow::toggle4Changed()
+  //////////////////////////////////////////////////////////////////////////////
+  ///\brief   Handler for the toggle changed event.
+  ///\param   [in] sender: The sending control.
+  ///\param   [in] newVal: The new value.
+  //////////////////////////////////////////////////////////////////////////////
+  void toggle4Changed(QImageToggle4* sender, int newVal);
 
   //////////////////////////////////////////////////////////////////////////////
   // MainWindow::ampAChanged()
@@ -186,102 +202,12 @@ private slots:
   void cabAChanged(int value);
 
   //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::dialChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the dial changed event.
-  ///\param   [in] controlID: Control channel of the dial.
-  ///\param   [in] value:     New value of the dial.
-  //////////////////////////////////////////////////////////////////////////////
-  void dialChanged(int controlID, int value);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::sliderChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the slider changed event.
-  ///\param   [in] controlID: Control channel of the slider.
-  ///\param   [in] value:     New value of the slider.
-  //////////////////////////////////////////////////////////////////////////////
-  void sliderChanged(int controlID, int value);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::voiceA1toggled()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the voice A1 radio button toggle event.
-  ///\param   [in] checked: New state of the button.
-  //////////////////////////////////////////////////////////////////////////////
-  void voiceA1toggled(bool checked);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::voiceA2toggled()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the voice A2 radio button toggle event.
-  ///\param   [in] checked: New state of the button.
-  //////////////////////////////////////////////////////////////////////////////
-  void voiceA2toggled(bool checked);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::voiceA3toggled()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the voice A3 radio button toggle event.
-  ///\param   [in] checked: New state of the button.
-  //////////////////////////////////////////////////////////////////////////////
-  void voiceA3toggled(bool checked);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::voiceA4toggled()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the voice A4 radio button toggle event.
-  ///\param   [in] checked: New state of the button.
-  //////////////////////////////////////////////////////////////////////////////
-  void voiceA4toggled(bool checked);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::reverbBypassAChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the reverb A bypass checkbox change event.
-  ///\param   [in] value: New state of the box.
-  //////////////////////////////////////////////////////////////////////////////
-  void reverbBypassAChanged(int value);
-
-  //////////////////////////////////////////////////////////////////////////////
   // MainWindow::reverbAChanged()
   //////////////////////////////////////////////////////////////////////////////
   ///\brief   Handler for the reverb A combo box selection changed event.
   ///\param   [in] value: Index of the selected item.
   //////////////////////////////////////////////////////////////////////////////
   void reverbAChanged(int value);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::topolA1toggled()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the topology A1 radio button toggle event.
-  ///\param   [in] checked: New state of the button.
-  //////////////////////////////////////////////////////////////////////////////
-  void topolA1toggled(bool checked);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::topolA2toggled()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the topology A2 radio button toggle event.
-  ///\param   [in] checked: New state of the button.
-  //////////////////////////////////////////////////////////////////////////////
-  void topolA2toggled(bool checked);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::topolA3toggled()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the topology A3 radio button toggle event.
-  ///\param   [in] checked: New state of the button.
-  //////////////////////////////////////////////////////////////////////////////
-  void topolA3toggled(bool checked);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::topolA4toggled()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the topology A4 radio button toggle event.
-  ///\param   [in] checked: New state of the button.
-  //////////////////////////////////////////////////////////////////////////////
-  void topolA4toggled(bool checked);
 
   //////////////////////////////////////////////////////////////////////////////
   // MainWindow::ampBChanged()
@@ -300,84 +226,12 @@ private slots:
   void cabBChanged(int value);
 
   //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::voiceB1toggled()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the voice B1 radio button toggle event.
-  ///\param   [in] checked: New state of the button.
-  //////////////////////////////////////////////////////////////////////////////
-  void voiceB1toggled(bool checked);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::voiceB2toggled()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the voice B2 radio button toggle event.
-  ///\param   [in] checked: New state of the button.
-  //////////////////////////////////////////////////////////////////////////////
-  void voiceB2toggled(bool checked);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::voiceB3toggled()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the voice B3 radio button toggle event.
-  ///\param   [in] checked: New state of the button.
-  //////////////////////////////////////////////////////////////////////////////
-  void voiceB3toggled(bool checked);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::voiceB4toggled()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the voice B4 radio button toggle event.
-  ///\param   [in] checked: New state of the button.
-  //////////////////////////////////////////////////////////////////////////////
-  void voiceB4toggled(bool checked);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::reverbBypassBChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the reverb B bypass checkbox change event.
-  ///\param   [in] value: New state of the box.
-  //////////////////////////////////////////////////////////////////////////////
-  void reverbBypassBChanged(int value);
-
-  //////////////////////////////////////////////////////////////////////////////
   // MainWindow::reverbBChanged()
   //////////////////////////////////////////////////////////////////////////////
   ///\brief   Handler for the reverb B combo box selection changed event.
   ///\param   [in] value: Index of the selected item.
   //////////////////////////////////////////////////////////////////////////////
   void reverbBChanged(int value);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::topolB1toggled()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the topology B1 radio button toggle event.
-  ///\param   [in] checked: New state of the button.
-  //////////////////////////////////////////////////////////////////////////////
-  void topolB1toggled(bool checked);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::topolB2toggled()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the topology B2 radio button toggle event.
-  ///\param   [in] checked: New state of the button.
-  //////////////////////////////////////////////////////////////////////////////
-  void topolB2toggled(bool checked);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::topolB3toggled()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the topology B3 radio button toggle event.
-  ///\param   [in] checked: New state of the button.
-  //////////////////////////////////////////////////////////////////////////////
-  void topolB3toggled(bool checked);
-
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::topolB4toggled()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the topology B4 radio button toggle event.
-  ///\param   [in] checked: New state of the button.
-  //////////////////////////////////////////////////////////////////////////////
-  void topolB4toggled(bool checked);
 
   //////////////////////////////////////////////////////////////////////////////
   // MainWindow::micChanged()
@@ -387,89 +241,61 @@ private slots:
   //////////////////////////////////////////////////////////////////////////////
   void micChanged(int value);
 
-  //////////////////////////////////////////////////////////////////////////////
-  // MainWindow::lowVolChanged()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the low volume checkbox change event.
-  ///\param   [in] value: New state of the box.
-  //////////////////////////////////////////////////////////////////////////////
-  void lowVolChanged(int value);
-
 private:
 
   //////////////////////////////////////////////////////////////////////////////
   // Member:
-  QComboBox*    ampA;            ///> Channel A amp model selector.
-  QComboBox*    cabA;            ///> Channel A cabinet selector.
-  DTDial*       gainA;           ///> Channel A gain dial.
-  DTDial*       bassA;           ///> Channel A bass dial.
-  DTDial*       middleA;         ///> Channel A middle dial.
-  DTDial*       trebleA;         ///> Channel A treble dial.
-  DTDial*       presenceA;       ///> Channel A presence dial.
-  DTDial*       volumeA;         ///> Channel A volume dial.
-  QCheckBox*    reverbBypassA;   ///> Reverb A enabled switch.
-  QComboBox*    reverbA;         ///> Reverb A type selector.
-  DTDial*       reverbDecayA;    ///> Reverb A decay dial.
-  DTDial*       reverbPredelayA; ///> Reverb A pre delay dial.
-  DTDial*       reverbToneA;     ///> Reverb A tone dial.
-  DTDial*       reverbMixA;      ///> Reverb A mix dial.
-  QRadioButton* voiceA1;         ///> Channel A voice I select.
-  QRadioButton* voiceA2;         ///> Channel A voice II select.
-  QRadioButton* voiceA3;         ///> Channel A voice III select.
-  QRadioButton* voiceA4;         ///> Channel A voice IV select.
-  DTSlider*     classA;          ///> Channel A, Class A/B switch.
-  DTSlider*     xtodeA;          ///> Channel A Pentode / triode switch.
-  QRadioButton* topolA1;         ///> Channel A topology I select.
-  QRadioButton* topolA2;         ///> Channel A topology II select.
-  QRadioButton* topolA3;         ///> Channel A topology III select.
-  QRadioButton* topolA4;         ///> Channel A topology IV select.
-  DTSlider*      boostA;          ///> Channel A tube boost on/off.
-  DTSlider*      pivoltA;         ///> Channel A phase inverter switch.
-  DTSlider*     capA;            ///> Channel A cap X, cap Y switch.
-  QComboBox*    ampB;            ///> Channel B amp model selector.
-  QComboBox*    cabB;            ///> Channel B cabinet selector.
-  DTDial*       gainB;           ///> Channel B gain dial.
-  DTDial*       bassB;           ///> Channel B bass dial.
-  DTDial*       middleB;         ///> Channel B middle dial.
-  DTDial*       trebleB;         ///> Channel B treble dial.
-  DTDial*       presenceB;       ///> Channel B presence dial.
-  DTDial*       volumeB;         ///> Channel B volume dial.
-  QCheckBox*    reverbBypassB;   ///> Reverb B enabled switch.
-  QComboBox*    reverbB;         ///> Reverb B type selector.
-  DTDial*       reverbDecayB;    ///> Reverb B decay dial.
-  DTDial*       reverbPredelayB; ///> Reverb B pre delay dial.
-  DTDial*       reverbToneB;     ///> Reverb B tone dial.
-  DTDial*       reverbMixB;      ///> Reverb B mix dial.
-  QRadioButton* voiceB1;         ///> Channel B voice I select.
-  QRadioButton* voiceB2;         ///> Channel B voice II select.
-  QRadioButton* voiceB3;         ///> Channel B voice III select.
-  QRadioButton* voiceB4;         ///> Channel B voice IV select.
-  DTSlider*     classB;          ///> Channel B, Class A/B switch.
-  DTSlider*     xtodeB;          ///> Channel B Pentode / triode switch.
-  QRadioButton* topolB1;         ///> Channel B topology I select.
-  QRadioButton* topolB2;         ///> Channel B topology II select.
-  QRadioButton* topolB3;         ///> Channel B topology III select.
-  QRadioButton* topolB4;         ///> Channel B topology IV select.
-  DTSlider*     boostB;          ///> Channel B tube boost on/off.
-  DTSlider*     pivoltB;         ///> Channel B phase inverter switch.
-  DTSlider*     capB;            ///> Channel B cap X, cap Y switch.
-  QComboBox*    mic;             ///> Master XLR mic simulation.
-  QCheckBox*    lowVol;          ///> Low volume switch.
-  DTSlider*     channel;         ///> Channel A/B switch.
-  DTDial*       master;          ///> Master volume.
-  QAction*      openAction;      ///> File->Open.
-  QAction*      saveAction;      ///> File->Save.
-  QAction*      saveAsAction;    ///> File->Save as.
-  QAction*      quitAction;      ///> File->Quit action.
-  QAction*      setupAction;     ///> Options->Setup action.
-  QAction*      defaultsAction;  ///> Options->Load defaults on amp change.
-  QAction*      masterAction;    ///> Options->Ignore master.
-  QAction*      aboutAction;     ///> Help->About action.
-  QAction*      aboutQtAction;   ///> Help->About Qt action.
-  QMenu*        fileMenu;        ///> File main menu item.
-  QMenu*        optionsMenu;     ///> Options main menu item.
-  QMenu*        helpMenu;        ///> Help main menu item.
-  bool          blocked;         ///> UI udate blocking flag.
+  QComboBox*     ampA;            ///\> Channel A amp model selector.
+  QComboBox*     cabA;            ///\> Channel A cabinet selector.
+  QImageDial*    gainA;           ///\> Channel A gain dial.
+  QImageDial*    bassA;           ///\> Channel A bass dial.
+  QImageDial*    middleA;         ///\> Channel A middle dial.
+  QImageDial*    trebleA;         ///\> Channel A treble dial.
+  QImageDial*    presenceA;       ///\> Channel A presence dial.
+  QImageDial*    volumeA;         ///\> Channel A volume dial.
+  QImageLED*     reverbLedA;      ///\> Channel A reverb LED.
+  QImageToggle*  reverbBypassA;   ///\> Reverb A enabled switch.
+  QComboBox*     reverbA;         ///\> Reverb A type selector.
+  QImageDial*    reverbDecayA;    ///\> Reverb A decay dial.
+  QImageDial*    reverbPredelayA; ///\> Reverb A pre delay dial.
+  QImageDial*    reverbToneA;     ///\> Reverb A tone dial.
+  QImageDial*    reverbMixA;      ///\> Reverb A mix dial.
+  QImageToggle4* voiceA;          ///\> Channel A voice selector.
+  QImageToggle*  classA;          ///\> Channel A, Class A/B switch.
+  QImageToggle*  xtodeA;          ///\> Channel A Pentode / triode switch.
+  QImageToggle4* topolA;          ///\> Channel A topology selector.
+  QImageToggle*  boostA;          ///\> Channel A tube boost on/off.
+  QImageToggle*  pivoltA;         ///\> Channel A phase inverter switch.
+  QImageToggle*  capA;            ///\> Channel A cap X, cap Y switch.
+  QComboBox*     ampB;            ///\> Channel B amp model selector.
+  QComboBox*     cabB;            ///\> Channel B cabinet selector.
+  QImageDial*    gainB;           ///\> Channel B gain dial.
+  QImageDial*    bassB;           ///\> Channel B bass dial.
+  QImageDial*    middleB;         ///\> Channel B middle dial.
+  QImageDial*    trebleB;         ///\> Channel B treble dial.
+  QImageDial*    presenceB;       ///\> Channel B presence dial.
+  QImageDial*    volumeB;         ///\> Channel B volume dial.
+  QImageLED*     reverbLedB;      ///\> Channel B reverb LED.
+  QImageToggle*  reverbBypassB;   ///\> Reverb B enabled switch.
+  QComboBox*     reverbB;         ///\> Reverb B type selector.
+  QImageDial*    reverbDecayB;    ///\> Reverb B decay dial.
+  QImageDial*    reverbPredelayB; ///\> Reverb B pre delay dial.
+  QImageDial*    reverbToneB;     ///\> Reverb B tone dial.
+  QImageDial*    reverbMixB;      ///\> Reverb B mix dial.
+  QImageToggle4* voiceB;          ///\> Channel B voice selector.
+  QImageToggle*  classB;          ///\> Channel B, Class A/B switch.
+  QImageToggle*  xtodeB;          ///\> Channel B Pentode / triode switch.
+  QImageToggle4* topolB;          ///\> Channel B topology selector.
+  QImageToggle*  boostB;          ///\> Channel B tube boost on/off.
+  QImageToggle*  pivoltB;         ///\> Channel B phase inverter switch.
+  QImageToggle*  capB;            ///\> Channel B cap X, cap Y switch.
+  QComboBox*     mic;             ///\> Master XLR mic simulation.
+  QImageLED*     lowVolLed;       ///\> Low Volume LED.
+  QImageToggle*  lowVol;          ///\> Low volume switch.
+  QImageToggle*  channel;         ///\> Channel A/B switch.
+  QImageDial*    master;          ///\> Master volume.
+  QImage         backPic;         ///\> Main background image.
+  bool           blocked;         ///\> UI udate blocking flag.
 };
 
 #endif // #ifndef __MAINWINDOW_H_INCLUDED__

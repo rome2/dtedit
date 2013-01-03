@@ -45,22 +45,19 @@ MainWindow::MainWindow(QWidget *parent) :
   setWindowTitle("DT Edit");
   setWindowIcon(QIcon(":/images/dtedit.png"));
 
-  // Initialize status bar:
-  statusBar()->setSizeGripEnabled(false);
-  statusBar()->showMessage(tr("Ready."));
+  // Hide status bar and menu:
+  statusBar()->setVisible(false);
+  menuBar()->setVisible(false);
 
-  // Crate all actions:
-  createActions();
-
-  // Create main menu:
-  createMenu();
+  // Load background:
+  backPic.load(":/images/back.png");
 
   // Create the main edit area:
   createEditArea();
 
   // Init size and position (screen center):
-  int w = 975;
-  int h = 480;
+  int w = backPic.width();
+  int h = backPic.height();
   int x = (QApplication::desktop()->width()  / 2) - (w / 2);
   int y = (QApplication::desktop()->height() / 2) - (h / 2);
 
@@ -71,14 +68,9 @@ MainWindow::MainWindow(QWidget *parent) :
   midiInName  = settings.value("MIDI/inputName",  QVariant("")).toString();
   midiOutName = settings.value("MIDI/outputName", QVariant("")).toString();
 
-  // Update UI:
-  defaultsAction->setChecked(settings.value("misc/loadDefaults", QVariant(true)).toBool());
-  masterAction->setChecked(settings.value("misc/ignoreMaster", QVariant(true)).toBool());
-  master->setEnabled(!masterAction->isChecked());
-
   // Place window:
-  setGeometry(x, y, w, h);
   setFixedSize(w, h);
+  setGeometry(x, y, width(), height());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -106,18 +98,12 @@ void MainWindow::closeEvent(QCloseEvent* e)
   // Save window position:
   QSettings settings;
   QRect rc = geometry();
-  settings.setValue("mainwindow/x",      rc.left());
-  settings.setValue("mainwindow/y",      rc.top());
-  settings.setValue("mainwindow/width",  rc.width());
-  settings.setValue("mainwindow/height", rc.height());
+  settings.setValue("mainwindow/x", rc.left());
+  settings.setValue("mainwindow/y", rc.top());
 
   // Save MIDI state:
   settings.setValue("MIDI/inputName",  midiInName);
   settings.setValue("MIDI/outputName", midiOutName);
-
-  // Save editor state:
-  settings.setValue("misc/loadDefaults", defaultsAction->isChecked());
-  settings.setValue("misc/ignoreMaster", masterAction->isChecked());
 
   // allow closing:
   e->accept();
@@ -145,6 +131,27 @@ void MainWindow::showEvent(QShowEvent* /*e*/)
 
   // Get current state:
   getValuesFromDT();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// MainWindow::paintEvent()
+////////////////////////////////////////////////////////////////////////////////
+///\brief   Message handler for the paint event.
+///\param   [in] e: Description of the event.
+////////////////////////////////////////////////////////////////////////////////
+void MainWindow::paintEvent(QPaintEvent* e)
+{
+  // Do we have a background image?
+  if (backPic.isNull())
+  {
+    // Let the base class do the painting:
+    QWidget::paintEvent(e);
+    return;
+  }
+
+  // Draw the back pic:
+  QPainter qp(this);
+  qp.drawImage(0, 0, backPic);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -184,52 +191,46 @@ void MainWindow::controlChangeReceived(unsigned char channel, unsigned char cont
     break;
   case CC_GAIN_A:
     oldState = gainA->blockSignals(true);
-    gainA->setValue(value);
+    gainA->setValue(value / 127.0);
     gainA->blockSignals(oldState);
     break;
   case CC_BASS_A:
     oldState = bassA->blockSignals(true);
-    bassA->setValue(value);
+    bassA->setValue(value / 127.0);
     bassA->blockSignals(oldState);
     break;
   case CC_MIDDLE_A:
     oldState = middleA->blockSignals(true);
-    middleA->setValue(value);
+    middleA->setValue(value / 127.0);
     middleA->blockSignals(oldState);
     break;
   case CC_TREBLE_A:
     oldState = trebleA->blockSignals(true);
-    trebleA->setValue(value);
+    trebleA->setValue(value / 127.0);
     trebleA->blockSignals(oldState);
     break;
   case CC_PRESENCE_A:
     oldState = presenceA->blockSignals(true);
-    presenceA->setValue(value);
+    presenceA->setValue(value / 127.0);
     presenceA->blockSignals(oldState);
     break;
   case CC_VOLUME_A:
     oldState = volumeA->blockSignals(true);
-    volumeA->setValue(value);
+    volumeA->setValue(value / 127.0);
     volumeA->blockSignals(oldState);
     break;
   case CC_VOICE_A:
-    oldState = voiceA1->blockSignals(true);
-    voiceA1->setChecked(value == 0);
-    voiceA1->blockSignals(oldState);
-    oldState = voiceA2->blockSignals(true);
-    voiceA2->setChecked(value == 1);
-    voiceA2->blockSignals(oldState);
-    oldState = voiceA3->blockSignals(true);
-    voiceA3->setChecked(value == 2);
-    voiceA3->blockSignals(oldState);
-    oldState = voiceA4->blockSignals(true);
-    voiceA4->setChecked(value == 3);
-    voiceA4->blockSignals(oldState);
+    oldState = voiceA->blockSignals(true);
+    voiceA->setValue(value);
+    voiceA->blockSignals(oldState);
     break;
   case CC_REV_BYPASS_A:
     oldState = reverbBypassA->blockSignals(true);
-    reverbBypassA->setChecked(value >= 64);
+    reverbBypassA->setValue(value >= 64);
     reverbBypassA->blockSignals(oldState);
+    oldState = reverbLedA->blockSignals(true);
+    reverbLedA->setValue(reverbBypassA->getValue());
+    reverbLedA->blockSignals(oldState);
     break;
   case CC_REV_TYPE_A:
     oldState = reverbA->blockSignals(true);
@@ -238,22 +239,22 @@ void MainWindow::controlChangeReceived(unsigned char channel, unsigned char cont
     break;
   case CC_REV_DECAY_A:
     oldState = reverbDecayA->blockSignals(true);
-    reverbDecayA->setValue(value);
+    reverbDecayA->setValue(value / 127.0);
     reverbDecayA->blockSignals(oldState);
     break;
   case CC_REV_PREDELAY_A:
     oldState = reverbPredelayA->blockSignals(true);
-    reverbPredelayA->setValue(value);
+    reverbPredelayA->setValue(value / 127.0);
     reverbPredelayA->blockSignals(oldState);
     break;
   case CC_REV_TONE_A:
     oldState = reverbToneA->blockSignals(true);
-    reverbToneA->setValue(value);
+    reverbToneA->setValue(value / 127.0);
     reverbToneA->blockSignals(oldState);
     break;
   case CC_REV_MIX_A:
     oldState = reverbMixA->blockSignals(true);
-    reverbMixA->setValue(value);
+    reverbMixA->setValue(value / 127.0);
     reverbMixA->blockSignals(oldState);
     break;
   case CC_CLASS_A:
@@ -262,18 +263,9 @@ void MainWindow::controlChangeReceived(unsigned char channel, unsigned char cont
     classA->blockSignals(oldState);
     break;
   case CC_TOPOL_A:
-    oldState = topolA1->blockSignals(true);
-    topolA1->setChecked(value == 0);
-    topolA1->blockSignals(oldState);
-    oldState = topolA2->blockSignals(true);
-    topolA2->setChecked(value == 1);
-    topolA2->blockSignals(oldState);
-    oldState = topolA3->blockSignals(true);
-    topolA3->setChecked(value == 2);
-    topolA3->blockSignals(oldState);
-    oldState = topolA4->blockSignals(true);
-    topolA4->setChecked(value == 3);
-    topolA4->blockSignals(oldState);
+    oldState = topolA->blockSignals(true);
+    topolA->setValue(value);
+    topolA->blockSignals(oldState);
     break;
   case CC_XTODE_A:
     oldState = xtodeA->blockSignals(true);
@@ -307,52 +299,46 @@ void MainWindow::controlChangeReceived(unsigned char channel, unsigned char cont
     break;
   case CC_GAIN_B:
     oldState = gainB->blockSignals(true);
-    gainB->setValue(value);
+    gainB->setValue(value / 127.0);
     gainB->blockSignals(oldState);
     break;
   case CC_BASS_B:
     oldState = bassB->blockSignals(true);
-    bassB->setValue(value);
+    bassB->setValue(value / 127.0);
     bassB->blockSignals(oldState);
     break;
   case CC_MIDDLE_B:
     oldState = middleB->blockSignals(true);
-    middleB->setValue(value);
+    middleB->setValue(value / 127.0);
     middleB->blockSignals(oldState);
     break;
   case CC_TREBLE_B:
     oldState = trebleB->blockSignals(true);
-    trebleB->setValue(value);
+    trebleB->setValue(value / 127.0);
     trebleB->blockSignals(oldState);
     break;
   case CC_PRESENCE_B:
     oldState = presenceB->blockSignals(true);
-    presenceB->setValue(value);
+    presenceB->setValue(value / 127.0);
     presenceB->blockSignals(oldState);
     break;
   case CC_VOLUME_B:
     oldState = volumeB->blockSignals(true);
-    volumeB->setValue(value);
+    volumeB->setValue(value / 127.0);
     volumeB->blockSignals(oldState);
     break;
   case CC_VOICE_B:
-    oldState = voiceB1->blockSignals(true);
-    voiceB1->setChecked(value == 0);
-    voiceB1->blockSignals(oldState);
-    oldState = voiceB2->blockSignals(true);
-    voiceB2->setChecked(value == 1);
-    voiceB2->blockSignals(oldState);
-    oldState = voiceB3->blockSignals(true);
-    voiceB3->setChecked(value == 2);
-    voiceB3->blockSignals(oldState);
-    oldState = voiceB4->blockSignals(true);
-    voiceB4->setChecked(value == 3);
-    voiceB4->blockSignals(oldState);
+    oldState = voiceB->blockSignals(true);
+    voiceB->setValue(value);
+    voiceB->blockSignals(oldState);
     break;
   case CC_REV_BYPASS_B:
     oldState = reverbBypassB->blockSignals(true);
-    reverbBypassB->setChecked(value >= 64);
+    reverbBypassB->setValue(value >= 64);
     reverbBypassB->blockSignals(oldState);
+    oldState = reverbLedB->blockSignals(true);
+    reverbLedB->setValue(reverbBypassB->getValue());
+    reverbLedB->blockSignals(oldState);
     break;
   case CC_REV_TYPE_B:
     oldState = reverbB->blockSignals(true);
@@ -361,22 +347,22 @@ void MainWindow::controlChangeReceived(unsigned char channel, unsigned char cont
     break;
   case CC_REV_DECAY_B:
     oldState = reverbDecayB->blockSignals(true);
-    reverbDecayB->setValue(value);
+    reverbDecayB->setValue(value / 127.0);
     reverbDecayB->blockSignals(oldState);
     break;
   case CC_REV_PREDELAY_B:
     oldState = reverbPredelayB->blockSignals(true);
-    reverbPredelayB->setValue(value);
+    reverbPredelayB->setValue(value / 127.0);
     reverbPredelayB->blockSignals(oldState);
     break;
   case CC_REV_TONE_B:
     oldState = reverbToneB->blockSignals(true);
-    reverbToneB->setValue(value);
+    reverbToneB->setValue(value / 127.0);
     reverbToneB->blockSignals(oldState);
     break;
   case CC_REV_MIX_B:
     oldState = reverbMixB->blockSignals(true);
-    reverbMixB->setValue(value);
+    reverbMixB->setValue(value / 127.0);
     reverbMixB->blockSignals(oldState);
     break;
   case CC_CLASS_B:
@@ -385,18 +371,9 @@ void MainWindow::controlChangeReceived(unsigned char channel, unsigned char cont
     classB->blockSignals(oldState);
     break;
   case CC_TOPOL_B:
-    oldState = topolB1->blockSignals(true);
-    topolB1->setChecked(value == 0);
-    topolB1->blockSignals(oldState);
-    oldState = topolB2->blockSignals(true);
-    topolB2->setChecked(value == 1);
-    topolB2->blockSignals(oldState);
-    oldState = topolB3->blockSignals(true);
-    topolB3->setChecked(value == 2);
-    topolB3->blockSignals(oldState);
-    oldState = topolB4->blockSignals(true);
-    topolB4->setChecked(value == 3);
-    topolB4->blockSignals(oldState);
+    oldState = topolB->blockSignals(true);
+    topolB->setValue(value);
+    topolB->blockSignals(oldState);
     break;
   case CC_XTODE_B:
     oldState = xtodeB->blockSignals(true);
@@ -425,8 +402,11 @@ void MainWindow::controlChangeReceived(unsigned char channel, unsigned char cont
     break;
   case CC_LOWVOLUME:
     oldState = lowVol->blockSignals(true);
-    lowVol->setChecked(value >= 64);
+    lowVol->setValue(value < 64);
     lowVol->blockSignals(oldState);
+    oldState = lowVolLed->blockSignals(true);
+    lowVolLed->setValue(!lowVol->getValue());
+    lowVolLed->blockSignals(oldState);
     break;
   case CC_CHANNEL:
     oldState = this->channel->blockSignals(true);
@@ -434,267 +414,11 @@ void MainWindow::controlChangeReceived(unsigned char channel, unsigned char cont
     this->channel->blockSignals(oldState);
     break;
   case CC_MASTER_VOL:
-    if (!masterAction->isChecked())
-    {
-      oldState = master->blockSignals(true);
-      master->setValue(value);
-      master->blockSignals(oldState);
-    }
+    oldState = master->blockSignals(true);
+    master->setValue(value / 127.0);
+    master->blockSignals(oldState);
     break;
   }
-}
-
-void MainWindow::readFile(const QString& fileName)
-{
-  // Open the file:
-  QFile file(fileName);
-  if (!file.open(QIODevice::ReadOnly))
-  {
-    // Warn user:
-    QMessageBox::warning(this, tr("File error"), tr("Error while opening the file."), QMessageBox::Ok);
-    return;
-  }
-
-  // Read the file:
-  QDomDocument doc;
-  if (!doc.setContent(&file))
-  {
-    // Warn user:
-    QMessageBox::warning(this, tr("File error"), tr("Error while reading the file."), QMessageBox::Ok);
-    file.close();
-    return;
-  }
-  file.close();
-
-  // Get root element:
-  QDomElement root = doc.documentElement();
-  if (root.tagName() != "dtsettings")
-  {
-    QMessageBox::warning(this, tr("File error"), tr("Error while reading the file: Root element not found."), QMessageBox::Ok);
-    return;
-  }
-
-  // Block UI:
-  sendBlockMessage(true);
-  this->setEnabled(false);
-  this->setCursor(Qt::WaitCursor);
-
-  // Loop through children:
-  QDomNode node = root.firstChild();
-  while (!node.isNull())
-  {
-    // Get tag:
-    QDomElement element = node.toElement();
-    if (!element.isNull())
-    {
-      // Is this a channel node?
-      if (element.tagName() == "channel")
-      {
-        // Get channel and voicing:
-        int channel = element.attribute("value", "0").toInt();
-        int voicing = element.attribute("selected_voicing", "0").toInt();
-
-        // Loop through voicings:
-        QDomNode voiceNode = node.firstChild();
-        while (!voiceNode.isNull())
-        {
-          // Get tag
-          QDomElement voiceElement = node.toElement();
-          if (!voiceElement.isNull())
-          {
-            // Is this a channel node?
-            if (voiceElement.tagName() == "voice")
-            {
-              // Get number of this voice:
-              int voiceNumber = voiceElement.attribute("value", "0").toInt();
-
-              // Switch to this voice:
-              if (channel == 0)
-                sendControlChange(DT_MIDI_CHANNEL, CC_VOICE_A, voiceNumber);
-              else
-                sendControlChange(DT_MIDI_CHANNEL, CC_VOICE_B, voiceNumber);
-              Sleep(50);
-
-              // Are we in channel A?
-              if (channel == 0)
-              {
-                // Set values:
-                sendControlChange(DT_MIDI_CHANNEL, CC_AMP_A,          voiceElement.attribute("amp", "1").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_CAP_TYPE_A,     voiceElement.attribute("cab", "1").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_GAIN_A,         voiceElement.attribute("drive", "64").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_BASS_A,         voiceElement.attribute("bass", "64").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_MIDDLE_A,       voiceElement.attribute("middle", "64").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_TREBLE_A,       voiceElement.attribute("treble", "64").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_PRESENCE_A,     voiceElement.attribute("presence", "64").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_VOLUME_A,       voiceElement.attribute("volume", "64").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_CLASS_A,        voiceElement.attribute("class", "0").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_TOPOL_A,        voiceElement.attribute("topology", "0").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_XTODE_A,        voiceElement.attribute("xtode", "0").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_BOOST_A,        voiceElement.attribute("boost", "0").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_PI_VOLTAGE_A,   voiceElement.attribute("pi_voltage", "0").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_CAP_TYPE_A,     voiceElement.attribute("cap", "0").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_REV_BYPASS_A,   voiceElement.attribute("reverb_enabled", "127").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_REV_TYPE_A,     voiceElement.attribute("reverb_type", "1").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_REV_DECAY_A,    voiceElement.attribute("reverb_decay", "64").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_REV_PREDELAY_A, voiceElement.attribute("reverb_predelay", "64").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_REV_TONE_A,     voiceElement.attribute("reverb_tone", "64").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_REV_MIX_A,      voiceElement.attribute("reverb_mix", "64").toInt());
-              }
-              else
-              {
-                sendControlChange(DT_MIDI_CHANNEL, CC_AMP_B,          voiceElement.attribute("amp", "1").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_CAP_TYPE_B,     voiceElement.attribute("cab", "1").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_GAIN_B,         voiceElement.attribute("drive", "64").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_BASS_B,         voiceElement.attribute("bass", "64").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_MIDDLE_B,       voiceElement.attribute("middle", "64").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_TREBLE_B,       voiceElement.attribute("treble", "64").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_PRESENCE_B,     voiceElement.attribute("presence", "64").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_VOLUME_B,       voiceElement.attribute("volume", "64").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_CLASS_B,        voiceElement.attribute("class", "0").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_TOPOL_B,        voiceElement.attribute("topology", "0").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_XTODE_B,        voiceElement.attribute("xtode", "0").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_BOOST_B,        voiceElement.attribute("boost", "0").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_PI_VOLTAGE_B,   voiceElement.attribute("pi_voltage", "0").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_CAP_TYPE_B,     voiceElement.attribute("cap", "0").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_REV_BYPASS_B,   voiceElement.attribute("reverb_enabled", "127").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_REV_TYPE_B,     voiceElement.attribute("reverb_type", "1").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_REV_DECAY_B,    voiceElement.attribute("reverb_decay", "64").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_REV_PREDELAY_B, voiceElement.attribute("reverb_predelay", "64").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_REV_TONE_B,     voiceElement.attribute("reverb_tone", "64").toInt());
-                sendControlChange(DT_MIDI_CHANNEL, CC_REV_MIX_B,      voiceElement.attribute("reverb_mix", "64").toInt());
-              }
-            }
-          }
-
-          // Next node:
-          voiceNode = voiceNode.nextSibling();
-        }
-
-        // Set current voicing:
-        if (channel == 0)
-          sendControlChange(DT_MIDI_CHANNEL, CC_VOICE_A, voicing);
-        else
-          sendControlChange(DT_MIDI_CHANNEL, CC_VOICE_B, voicing);
-      }
-
-      // Is this the master node?
-      else if (element.tagName() == "master")
-      {
-        // Set current channel:
-        sendControlChange(DT_MIDI_CHANNEL, CC_CHANNEL, element.attribute("selected_channel", "0").toInt());
-        Sleep(50);
-
-        // Set volume and mic simualtion:
-        sendControlChange(DT_MIDI_CHANNEL, CC_MASTER_VOL, element.attribute("master_volume", "0").toInt());
-        sendControlChange(DT_MIDI_CHANNEL, CC_XLR_MIC,    element.attribute("xlr_mic", "1").toInt());
-        sendControlChange(DT_MIDI_CHANNEL, CC_LOWVOLUME,  element.attribute("lowvolume_mode", "0").toInt());
-      }
-    }
-
-    // Next node:
-    node = node.nextSibling();
-  }
-
-  // Release UI:
-  sendBlockMessage(false);
-  this->setEnabled(true);
-  this->setCursor(Qt::ArrowCursor);
-
-  // Sync UI:
-  getValuesFromDT();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::createActions()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Create all required actions.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::createActions()
-{
-  // File->Open:
-  openAction = new QAction(QIcon(":/images/open.png"), tr("&Open..."), this);
-  openAction->setShortcuts(QKeySequence::Open);
-  openAction->setStatusTip(tr("Load settings from file"));
-  openAction->setIconVisibleInMenu(true);
-  connect(openAction, SIGNAL(triggered()), this, SLOT(openFile()));
-
-  // File->Save:
-  saveAction = new QAction(QIcon(":/images/save.png"), tr("&Save"), this);
-  saveAction->setShortcuts(QKeySequence::Save);
-  saveAction->setStatusTip(tr("Save current settings to file."));
-  saveAction->setIconVisibleInMenu(true);
-  connect(saveAction, SIGNAL(triggered()), this, SLOT(saveFile()));
-
-  // File->Save as:
-  saveAsAction = new QAction(QIcon(":/images/save_as.png"), tr("Save &as..."), this);
-  saveAsAction->setShortcuts(QKeySequence::SaveAs);
-  saveAsAction->setStatusTip(tr("Save settings under a new name."));
-  saveAsAction->setIconVisibleInMenu(true);
-  connect(saveAsAction, SIGNAL(triggered()), this, SLOT(saveAsFile()));
-
-  // File->Quit:
-  quitAction = new QAction(QIcon(":/images/close.png"), tr("&Quit"), this);
-  quitAction->setShortcuts(QKeySequence::Quit);
-  quitAction->setStatusTip(tr("Quit the application"));
-  quitAction->setIconVisibleInMenu(true);
-  connect(quitAction, SIGNAL(triggered()), this, SLOT(exitApplication()));
-
-  // Options->Setup:
-  setupAction = new QAction(QIcon(":/images/midi.png"), tr("&MIDI Setup..."), this);
-  setupAction->setStatusTip(tr("Setup MIDI connections"));
-  setupAction->setIconVisibleInMenu(true);
-  connect(setupAction, SIGNAL(triggered()), this, SLOT(setupMIDI()));
-
-  // Options->Set amps with defaults:
-  defaultsAction = new QAction(tr("&Load amps with defaults"), this);
-  defaultsAction->setStatusTip(tr("Load default power amp and cab setting when switching amp models"));
-  defaultsAction->setCheckable(true);
-
-  // Options->Ignore master:
-  masterAction = new QAction(tr("&Ignore master"), this);
-  masterAction->setStatusTip(tr("Ignore master knob and setting changes."));
-  masterAction->setCheckable(true);
-  connect(masterAction, SIGNAL(toggled(bool)), this, SLOT(ignoreMasterChanged(bool)));
-
-  // Help->About:
-  aboutAction = new QAction(QIcon(":/images/about.png"), tr("&About..."), this);
-  aboutAction->setStatusTip(tr("Show the application's About box"));
-  aboutAction->setIconVisibleInMenu(true);
-  connect(aboutAction, SIGNAL(triggered()), this, SLOT(about()));
-
-  // Help->About Qt:
-  aboutQtAction = new QAction(QIcon(":/images/qt.png"), tr("About &Qt..."), this);
-  aboutQtAction->setStatusTip(tr("Show the Qt library's About box"));
-  aboutQtAction->setIconVisibleInMenu(true);
-  connect(aboutQtAction, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::createMenu()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Create the main menu.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::createMenu()
-{
-  // File menu:
-  fileMenu = menuBar()->addMenu(tr("&File"));
-  //fileMenu->addAction(openAction);
-  //fileMenu->addAction(saveAction);
-  //fileMenu->addAction(saveAsAction);
-  //fileMenu->addSeparator();
-  fileMenu->addAction(quitAction);
-
-  // Options menu:
-  optionsMenu = menuBar()->addMenu(tr("&Options"));
-  optionsMenu->addAction(defaultsAction);
-  optionsMenu->addAction(masterAction);
-  optionsMenu->addSeparator();
-  optionsMenu->addAction(setupAction);
-
-  // Help menu:
-  helpMenu = menuBar()->addMenu(tr("&Help"));
-  helpMenu->addAction(aboutAction);
-  helpMenu->addAction(aboutQtAction);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -704,14 +428,19 @@ void MainWindow::createMenu()
 ////////////////////////////////////////////////////////////////////////////////
 void MainWindow::createEditArea()
 {
-  // Group box for the channel A preamp values:
-  QGroupBox* group = new QGroupBox(this);
-  group->setTitle("Preamp A");
-  group->setFlat(false);
-  group->setGeometry(15, menuBar()->height() + 8, 670, 92);
+  int x0 = 0;
+  int y0 = 22;
+  QString comboStyle("QComboBox { background: #202020; color: white; border: 1px solid #606060; }");
 
-  // Channel A amp model selector:
-  ampA = new QComboBox(group);
+  voiceA = new QImageToggle4(this);
+  voiceA->setGeometry(x0 + 34, y0 + 30, 48, 48);
+  voiceA->getImage().load(":/images/I_II_III_IV.png");
+  voiceA->getDisabledImage().load(":/images/I_II_III_IV_disabled.png");
+  voiceA->setEnabled(true);
+  voiceA->setTag(CC_VOICE_A);
+  connect(voiceA, SIGNAL(valueChanged(QImageToggle4*, int)), this, SLOT(toggle4Changed(QImageToggle4*, int)));
+
+  ampA = new QComboBox(this);
   ampA->addItem("None");
   ampA->addItem("Blackface Double Normal");
   ampA->addItem("Blackface Double Vib");
@@ -743,15 +472,11 @@ void MainWindow::createEditArea()
   ampA->addItem("Solo 100 Overdrive");
   ampA->addItem("Line 6 Doom");
   ampA->addItem("Line 6 Epic");
-  ampA->setGeometry(50, 26, 134, 22);
+  ampA->setGeometry(x0 + 142, y0 + 34, 134, 22);
+  ampA->setStyleSheet(comboStyle);
   connect(ampA, SIGNAL(currentIndexChanged(int)), this, SLOT(ampAChanged(int)));
-  QLabel* label = new QLabel(group);
-  label->setText("Amp");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(10, 30, 30, 20);
 
-  // Channel A cabinet selector:
-  cabA = new QComboBox(group);
+  cabA = new QComboBox(this);
   cabA->addItem("None");
   cabA->addItem("2x12 Blackface Double");
   cabA->addItem("4x12 Hiway");
@@ -770,100 +495,71 @@ void MainWindow::createEditArea()
   cabA->addItem("4x12 Tread V-30");
   cabA->addItem("4x12 XXL V-30");
   cabA->addItem("1x15 Flip Top (Bass)");
-  cabA->setGeometry(50, 53, 134, 22);
+  cabA->setGeometry(x0 + 142, y0 + 64, 134, 22);
+  cabA->setStyleSheet(comboStyle);
   connect(cabA, SIGNAL(currentIndexChanged(int)), this, SLOT(cabAChanged(int)));
-  label = new QLabel(group);
-  label->setText("Cab");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(10, 58, 30, 20);
 
-  // Channel A gain dial:
-  gainA = new DTDial(group, CC_GAIN_A);
-  gainA->setGeometry(200, 26, 32, 32);
-  connect(gainA, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
-  label = new QLabel(group);
-  label->setText("Drive");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(184, 58, 64, 20);
+  gainA = new QImageDial(this);
+  gainA->getImage().load(":/images/knob_movie.png");
+  gainA->getDisabledImage().load(":/images/knob_disabled.png");
+  gainA->setFrameCount(61);
+  gainA->setEnabled(true);
+  gainA->setGeometry(x0 + 303, y0 + 30, 48, 48);
+  gainA->setTag(CC_GAIN_A);
+  connect(gainA, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
+  connect(gainA, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
 
-  // Channel A bass dial:
-  bassA = new DTDial(group, CC_BASS_A);
-  bassA->setGeometry(264, 26, 32, 32);
-  connect(bassA, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
-  label = new QLabel(group);
-  label->setText("Bass");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(248, 58, 64, 20);
+  bassA = new QImageDial(this);
+  bassA->getImage().load(":/images/knob_movie.png");
+  bassA->getDisabledImage().load(":/images/knob_disabled.png");
+  bassA->setFrameCount(61);
+  bassA->setEnabled(true);
+  bassA->setGeometry(x0 + 367, y0 + 30, 48, 48);
+  bassA->setTag(CC_BASS_A);
+  connect(bassA, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
+  connect(bassA, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
 
-  // Channel A middle dial:
-  middleA = new DTDial(group, CC_MIDDLE_A);
-  middleA->setGeometry(328, 26, 32, 32);
-  connect(middleA, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
-  label = new QLabel(group);
-  label->setText("Middle");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(312, 58, 64, 20);
+  middleA = new QImageDial(this);
+  middleA->getImage().load(":/images/knob_movie.png");
+  middleA->getDisabledImage().load(":/images/knob_disabled.png");
+  middleA->setFrameCount(61);
+  middleA->setEnabled(true);
+  middleA->setGeometry(x0 + 431, y0 + 30, 48, 48);
+  middleA->setTag(CC_MIDDLE_A);
+  connect(middleA, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
+  connect(middleA, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
 
-  // Channel A treble dial:
-  trebleA = new DTDial(group, CC_TREBLE_A);
-  trebleA->setGeometry(394, 26, 32, 32);
-  connect(trebleA, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
-  label = new QLabel(group);
-  label->setText("Treble");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(378, 58, 64, 20);
+  trebleA = new QImageDial(this);
+  trebleA->getImage().load(":/images/knob_movie.png");
+  trebleA->getDisabledImage().load(":/images/knob_disabled.png");
+  trebleA->setFrameCount(61);
+  trebleA->setEnabled(true);
+  trebleA->setGeometry(x0 + 495, y0 + 30, 48, 48);
+  trebleA->setTag(CC_TREBLE_A);
+  connect(trebleA, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
+  connect(trebleA, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
 
-  // Channel A presence dial:
-  presenceA = new DTDial(group, CC_PRESENCE_A);
-  presenceA->setGeometry(460, 26, 32, 32);
-  connect(presenceA, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
-  label = new QLabel(group);
-  label->setText("Presence");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(444, 58, 64, 20);
+  presenceA = new QImageDial(this);
+  presenceA->getImage().load(":/images/knob_movie.png");
+  presenceA->getDisabledImage().load(":/images/knob_disabled.png");
+  presenceA->setFrameCount(61);
+  presenceA->setEnabled(true);
+  presenceA->setGeometry(x0 + 559, y0 + 30, 48, 48);
+  presenceA->setTag(CC_PRESENCE_A);
+  connect(presenceA, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
+  connect(presenceA, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
 
-  // Channel A volume dial:
-  volumeA = new DTDial(group, CC_VOLUME_A);
-  volumeA->setGeometry(524, 26, 32, 32);
-  connect(volumeA, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
-  label = new QLabel(group);
-  label->setText("Volume");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(508, 58, 64, 20);
+  volumeA = new QImageDial(this);
+  volumeA->getImage().load(":/images/knob_movie.png");
+  volumeA->getDisabledImage().load(":/images/knob_disabled.png");
+  volumeA->setFrameCount(61);
+  volumeA->setEnabled(true);
+  volumeA->setGeometry(x0 + 623, y0 + 30, 48, 48);
+  volumeA->setTag(CC_VOLUME_A);
+  connect(volumeA, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
+  connect(volumeA, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
 
-  // Channel A voice selector:
-  voiceA1 = new QRadioButton(group);
-  voiceA1->setText("I");
-  voiceA1->setGeometry(580, 26, 40, 25);
-  voiceA1->setChecked(true);
-  connect(voiceA1, SIGNAL(toggled(bool)), this, SLOT(voiceA1toggled(bool)));
-  voiceA2 = new QRadioButton(group);
-  voiceA2->setText("II");
-  voiceA2->setGeometry(620, 26, 40, 25);
-  connect(voiceA2, SIGNAL(toggled(bool)), this, SLOT(voiceA2toggled(bool)));
-  voiceA3 = new QRadioButton(group);
-  voiceA3->setText("III");
-  voiceA3->setGeometry(580, 51, 40, 25);
-  connect(voiceA3, SIGNAL(toggled(bool)), this, SLOT(voiceA3toggled(bool)));
-  voiceA4 = new QRadioButton(group);
-  voiceA4->setText("IV");
-  voiceA4->setGeometry(620, 51, 40, 25);
-  connect(voiceA4, SIGNAL(toggled(bool)), this, SLOT(voiceA4toggled(bool)));
-
-  // Group box for the channel A reverb values:
-  group = new QGroupBox(this);
-  group->setTitle("Reverb A");
-  group->setFlat(false);
-  group->setGeometry(235, menuBar()->height() + 110, 450, 92);
-
-  // Reverb A bypass switch:
-  reverbBypassA = new QCheckBox(group);
-  reverbBypassA->setText("Enabled");
-  connect(reverbBypassA, SIGNAL(stateChanged(int)), this, SLOT(reverbBypassAChanged(int)));
-  reverbBypassA->setGeometry(10, 22, 134, 22);
-
-  // Channel A reverb selector:
-  reverbA = new QComboBox(group);
+  reverbA = new QComboBox(this);
   reverbA->addItem("None");
   reverbA->addItem("Spring");
   reverbA->addItem("'63 Spring");
@@ -877,151 +573,124 @@ void MainWindow::createEditArea()
   reverbA->addItem("Tile");
   reverbA->addItem("Echo");
   reverbA->addItem("Particle Verb");
-  reverbA->setGeometry(50, 53, 134, 22);
+  reverbA->setGeometry(x0 + 280, y0 + 168, 134, 22);
+  reverbA->setStyleSheet(comboStyle);
   connect(reverbA, SIGNAL(currentIndexChanged(int)), this, SLOT(reverbAChanged(int)));
-  label = new QLabel(group);
-  label->setText("Type");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(10, 58, 30, 20);
 
-  // Reverb A decay dial:
-  reverbDecayA = new DTDial(group, CC_REV_DECAY_A);
-  reverbDecayA->setGeometry(200, 26, 32, 32);
-  connect(reverbDecayA, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
-  label = new QLabel(group);
-  label->setText("Decay");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(184, 58, 64, 20);
+  reverbLedA = new QImageLED(this);
+  reverbLedA->getImage().load(":/images/led_yellow.png");
+  reverbLedA->getDisabledImage().load(":/images/led_yellow_disabled.png");
+  reverbLedA->setGeometry(x0 + 244, y0 + 130, 31, 31);
+  reverbLedA->setEnabled(true);
+  reverbLedA->setValue(true);
 
-  // Reverb A predelay dial:
-  reverbPredelayA = new DTDial(group, CC_REV_PREDELAY_A);
-  reverbPredelayA->setGeometry(264, 26, 32, 32);
-  connect(reverbPredelayA, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
-  label = new QLabel(group);
-  label->setText("Pre Delay");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(248, 58, 64, 20);
+  reverbBypassA = new QImageToggle(this);
+  reverbBypassA->setGeometry(x0 + 275, y0 + 130, 44, 31);
+  reverbBypassA->getImage().load(":/images/onoff.png");
+  reverbBypassA->getDisabledImage().load(":/images/onoff_disabled.png");
+  reverbBypassA->setEnabled(true);
+  reverbBypassA->setTag(CC_REV_BYPASS_A);
+  reverbBypassA->setLeftRight(true);
+  reverbBypassA->setValue(true);
+  connect(reverbBypassA, SIGNAL(valueChanged(QImageToggle*, bool)), this, SLOT(toggleChanged(QImageToggle*, bool)));
 
-  // Reverb A tone dial:
-  reverbToneA = new DTDial(group, CC_REV_TONE_A);
-  reverbToneA->setGeometry(328, 26, 32, 32);
-  connect(reverbToneA, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
-  label = new QLabel(group);
-  label->setText("Tone");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(312, 58, 64, 20);
+  reverbDecayA = new QImageDial(this);
+  reverbDecayA->getImage().load(":/images/knob_movie.png");
+  reverbDecayA->getDisabledImage().load(":/images/knob_disabled.png");
+  reverbDecayA->setFrameCount(61);
+  reverbDecayA->setEnabled(true);
+  reverbDecayA->setGeometry(x0 + 431, y0 + 133, 48, 48);
+  reverbDecayA->setTag(CC_REV_DECAY_A);
+  connect(reverbDecayA, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
+  connect(reverbDecayA, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
 
-  // Reverb A mix dial:
-  reverbMixA = new DTDial(group, CC_REV_MIX_A);
-  reverbMixA->setGeometry(394, 26, 32, 32);
-  connect(reverbMixA, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
-  label = new QLabel(group);
-  label->setText("Mix");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(378, 58, 64, 20);
+  reverbPredelayA = new QImageDial(this);
+  reverbPredelayA->getImage().load(":/images/knob_movie.png");
+  reverbPredelayA->getDisabledImage().load(":/images/knob_disabled.png");
+  reverbPredelayA->setFrameCount(61);
+  reverbPredelayA->setEnabled(true);
+  reverbPredelayA->setGeometry(x0 + 495, y0 + 133, 48, 48);
+  reverbPredelayA->setTag(CC_REV_PREDELAY_A);
+  connect(reverbPredelayA, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
+  connect(reverbPredelayA, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
 
-  // Group box for the channel A poweramp values:
-  group = new QGroupBox(this);
-  group->setTitle("Poweramp A");
-  group->setFlat(false);
-  group->setGeometry(700, menuBar()->height() + 8, 255, 194);
+  reverbToneA = new QImageDial(this);
+  reverbToneA->getImage().load(":/images/knob_movie.png");
+  reverbToneA->getDisabledImage().load(":/images/knob_disabled.png");
+  reverbToneA->setFrameCount(61);
+  reverbToneA->setEnabled(true);
+  reverbToneA->setGeometry(x0 + 559, y0 + 133, 48, 48);
+  reverbToneA->setTag(CC_REV_TONE_A);
+  connect(reverbToneA, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
+  connect(reverbToneA, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
 
-  // Channel A Class A/AB switch:
-  classA = new DTSlider(group, CC_CLASS_A);
-  classA->setGeometry(26, 40, 32, 28);
-  connect(classA, SIGNAL(valueChanged2(int, int)), this, SLOT(sliderChanged(int, int)));
-  label = new QLabel(group);
-  label->setText("Class A/B");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(10, 20, 64, 20);
-  label = new QLabel(group);
-  label->setText("Class A");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(10, 68, 64, 20);
+  reverbMixA = new QImageDial(this);
+  reverbMixA->getImage().load(":/images/knob_movie.png");
+  reverbMixA->getDisabledImage().load(":/images/knob_disabled.png");
+  reverbMixA->setFrameCount(61);
+  reverbMixA->setEnabled(true);
+  reverbMixA->setGeometry(x0 + 623, y0 + 133, 48, 48);
+  reverbMixA->setTag(CC_REV_MIX_A);
+  connect(reverbMixA, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
+  connect(reverbMixA, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
 
-  // Channel A Pentode/Triode switch:
-  xtodeA = new DTSlider(group, CC_XTODE_A);
-  xtodeA->setGeometry(196, 40, 32, 28);
-  connect(xtodeA, SIGNAL(valueChanged2(int, int)), this, SLOT(sliderChanged(int, int)));
-  label = new QLabel(group);
-  label->setText("Pentode");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(180, 20, 64, 20);
-  label = new QLabel(group);
-  label->setText("Triode");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(180, 68, 64, 20);
+  classA = new QImageToggle(this);
+  classA->setGeometry(x0 + 720, y0 + 23, 64, 88);
+  classA->getImage().load(":/images/class.png");
+  classA->getDisabledImage().load(":/images/class_disabled.png");
+  classA->setEnabled(true);
+  classA->setTag(CC_CLASS_A);
+  connect(classA, SIGNAL(valueChanged(QImageToggle*, bool)), this, SLOT(toggleChanged(QImageToggle*, bool)));
 
-  // Channel A topology selector:
-  topolA1 = new QRadioButton(group);
-  topolA1->setText("I");
-  topolA1->setGeometry(90, 18, 40, 25);
-  topolA1->setChecked(true);
-  connect(topolA1, SIGNAL(toggled(bool)), this, SLOT(topolA1toggled(bool)));
-  topolA2 = new QRadioButton(group);
-  topolA2->setText("II");
-  topolA2->setGeometry(130, 18, 40, 25);
-  connect(topolA2, SIGNAL(toggled(bool)), this, SLOT(topolA2toggled(bool)));
-  topolA3 = new QRadioButton(group);
-  topolA3->setText("III");
-  topolA3->setGeometry(90, 43, 40, 25);
-  connect(topolA3, SIGNAL(toggled(bool)), this, SLOT(topolA3toggled(bool)));
-  topolA4 = new QRadioButton(group);
-  topolA4->setText("IV");
-  topolA4->setGeometry(130, 43, 40, 25);
-  connect(topolA4, SIGNAL(toggled(bool)), this, SLOT(topolA4toggled(bool)));
-  label = new QLabel(group);
-  label->setText("Topology");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(90, 68, 80, 20);
+  topolA = new QImageToggle4(this);
+  topolA->setGeometry(x0 + 804, y0 + 38, 48, 48);
+  topolA->getImage().load(":/images/I_II_III_IV.png");
+  topolA->getDisabledImage().load(":/images/I_II_III_IV_disabled.png");
+  topolA->setEnabled(true);
+  topolA->setTag(CC_TOPOL_A);
+  connect(topolA, SIGNAL(valueChanged(QImageToggle4*, int)), this, SLOT(toggle4Changed(QImageToggle4*, int)));
 
-  // Channel A boost switch:
-  boostA = new DTSlider(group, CC_BOOST_A);
-  boostA->setGeometry(26, 132, 32, 28);
-  connect(boostA, SIGNAL(valueChanged2(int, int)), this, SLOT(sliderChanged(int, int)));
-  label = new QLabel(group);
-  label->setText("On");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(10, 112, 64, 20);
-  label = new QLabel(group);
-  label->setText("Boost");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(10, 160, 64, 20);
+  xtodeA = new QImageToggle(this);
+  xtodeA->setGeometry(x0 + 871, y0 + 23, 64, 88);
+  xtodeA->getImage().load(":/images/xtode.png");
+  xtodeA->getDisabledImage().load(":/images/xtode_disabled.png");
+  xtodeA->setEnabled(true);
+  xtodeA->setTag(CC_XTODE_A);
+  connect(xtodeA, SIGNAL(valueChanged(QImageToggle*, bool)), this, SLOT(toggleChanged(QImageToggle*, bool)));
 
-  // Channel A PI voltage switch:
-  pivoltA = new DTSlider(group, CC_PI_VOLTAGE_A);
-  pivoltA->setGeometry(110, 132, 32, 28);
-  connect(pivoltA, SIGNAL(valueChanged2(int, int)), this, SLOT(sliderChanged(int,int)));
-  label = new QLabel(group);
-  label->setText("PIV High");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(94, 112, 64, 20);
-  label = new QLabel(group);
-  label->setText("PIV Low");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(94, 160, 64, 20);
+  boostA = new QImageToggle(this);
+  boostA->setGeometry(x0 + 720, y0 + 112, 64, 88);
+  boostA->getImage().load(":/images/boost.png");
+  boostA->getDisabledImage().load(":/images/boost_disabled.png");
+  boostA->setEnabled(true);
+  boostA->setTag(CC_BOOST_A);
+  connect(boostA, SIGNAL(valueChanged(QImageToggle*, bool)), this, SLOT(toggleChanged(QImageToggle*, bool)));
 
-  // Channel A Cap X/Y switch:
-  capA = new DTSlider(group, CC_CAP_TYPE_A);
-  capA->setGeometry(196, 132, 32, 28);
-  connect(capA, SIGNAL(valueChanged2(int, int)), this, SLOT(sliderChanged(int, int)));
-  label = new QLabel(group);
-  label->setText("Tight");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(180, 112, 64, 20);
-  label = new QLabel(group);
-  label->setText("Smooth");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(180, 160, 64, 20);
+  pivoltA = new QImageToggle(this);
+  pivoltA->setGeometry(x0 + 795, y0 + 112, 64, 88);
+  pivoltA->getImage().load(":/images/piv.png");
+  pivoltA->getDisabledImage().load(":/images/piv_disabled.png");
+  pivoltA->setEnabled(true);
+  pivoltA->setTag(CC_PI_VOLTAGE_A);
+  connect(pivoltA, SIGNAL(valueChanged(QImageToggle*, bool)), this, SLOT(toggleChanged(QImageToggle*, bool)));
 
-  // Group box for the channel B preamp values:
-  group = new QGroupBox(this);
-  group->setTitle("Preamp B");
-  group->setFlat(false);
-  group->setGeometry(15, menuBar()->height() + 314, 670, 92);
+  capA = new QImageToggle(this);
+  capA->setGeometry(x0 + 871, y0 + 112, 64, 88);
+  capA->getImage().load(":/images/cap.png");
+  capA->getDisabledImage().load(":/images/cap_disabled.png");
+  capA->setEnabled(true);
+  capA->setTag(CC_CAP_TYPE_A);
+  connect(capA, SIGNAL(valueChanged(QImageToggle*, bool)), this, SLOT(toggleChanged(QImageToggle*, bool)));
 
-  // Channel B amp model selector:
-  ampB = new QComboBox(group);
+  voiceB = new QImageToggle4(this);
+  voiceB->setGeometry(x0 + 34, y0 + 336, 48, 48);
+  voiceB->getImage().load(":/images/I_II_III_IV.png");
+  voiceB->getDisabledImage().load(":/images/I_II_III_IV_disabled.png");
+  voiceB->setEnabled(true);
+  voiceB->setTag(CC_VOICE_B);
+  connect(voiceB, SIGNAL(valueChanged(QImageToggle4*, int)), this, SLOT(toggle4Changed(QImageToggle4*, int)));
+
+  ampB = new QComboBox(this);
   ampB->addItem("None");
   ampB->addItem("Blackface Double Normal");
   ampB->addItem("Blackface Double Vib");
@@ -1053,15 +722,11 @@ void MainWindow::createEditArea()
   ampB->addItem("Solo 100 Overdrive");
   ampB->addItem("Line 6 Doom");
   ampB->addItem("Line 6 Epic");
-  ampB->setGeometry(50, 26, 134, 22);
+  ampB->setGeometry(x0 + 143, y0 + 340, 134, 22);
+  ampB->setStyleSheet(comboStyle);
   connect(ampB, SIGNAL(currentIndexChanged(int)), this, SLOT(ampBChanged(int)));
-  label = new QLabel(group);
-  label->setText("Amp");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(10, 30, 30, 20);
 
-  // Channel B cabinet selector:
-  cabB = new QComboBox(group);
+  cabB = new QComboBox(this);
   cabB->addItem("None");
   cabB->addItem("2x12 Blackface Double");
   cabB->addItem("4x12 Hiway");
@@ -1080,100 +745,71 @@ void MainWindow::createEditArea()
   cabB->addItem("4x12 Tread V-30");
   cabB->addItem("4x12 XXL V-30");
   cabB->addItem("1x15 Flip Top (Bass)");
-  cabB->setGeometry(50, 53, 134, 22);
+  cabB->setGeometry(x0 + 143, y0 + 370, 134, 22);
+  cabB->setStyleSheet(comboStyle);
   connect(cabB, SIGNAL(currentIndexChanged(int)), this, SLOT(cabBChanged(int)));
-  label = new QLabel(group);
-  label->setText("Cab");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(10, 58, 30, 20);
 
-  // Channel B gain dial:
-  gainB = new DTDial(group, CC_GAIN_B);
-  gainB->setGeometry(200, 26, 32, 32);
-  connect(gainB, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
-  label = new QLabel(group);
-  label->setText("Drive");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(184, 58, 64, 20);
+  gainB = new QImageDial(this);
+  gainB->getImage().load(":/images/knob_movie.png");
+  gainB->getDisabledImage().load(":/images/knob_disabled.png");
+  gainB->setFrameCount(61);
+  gainB->setEnabled(true);
+  gainB->setGeometry(x0 + 303, y0 + 336, 48, 48);
+  gainB->setTag(CC_GAIN_B);
+  connect(gainB, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
+  connect(gainB, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
 
-  // Channel B bass dial:
-  bassB = new DTDial(group, CC_BASS_B);
-  bassB->setGeometry(264, 26, 32, 32);
-  connect(bassB, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
-  label = new QLabel(group);
-  label->setText("Bass");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(248, 58, 64, 20);
+  bassB = new QImageDial(this);
+  bassB->getImage().load(":/images/knob_movie.png");
+  bassB->getDisabledImage().load(":/images/knob_disabled.png");
+  bassB->setFrameCount(61);
+  bassB->setEnabled(true);
+  bassB->setGeometry(x0 + 367, y0 + 336, 48, 48);
+  bassB->setTag(CC_BASS_B);
+  connect(bassB, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
+  connect(bassB, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
 
-  // Channel B middle dial:
-  middleB = new DTDial(group, CC_MIDDLE_B);
-  middleB->setGeometry(328, 26, 32, 32);
-  connect(middleB, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
-  label = new QLabel(group);
-  label->setText("Middle");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(312, 58, 64, 20);
+  middleB = new QImageDial(this);
+  middleB->getImage().load(":/images/knob_movie.png");
+  middleB->getDisabledImage().load(":/images/knob_disabled.png");
+  middleB->setFrameCount(61);
+  middleB->setEnabled(true);
+  middleB->setGeometry(x0 + 431, y0 + 336, 48, 48);
+  middleB->setTag(CC_MIDDLE_B);
+  connect(middleB, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
+  connect(middleB, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
 
-  // Channel B treble dial:
-  trebleB = new DTDial(group, CC_TREBLE_B);
-  trebleB->setGeometry(394, 26, 32, 32);
-  connect(trebleB, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
-  label = new QLabel(group);
-  label->setText("Treble");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(378, 58, 64, 20);
+  trebleB = new QImageDial(this);
+  trebleB->getImage().load(":/images/knob_movie.png");
+  trebleB->getDisabledImage().load(":/images/knob_disabled.png");
+  trebleB->setFrameCount(61);
+  trebleB->setEnabled(true);
+  trebleB->setGeometry(x0 + 495, y0 + 336, 48, 48);
+  trebleB->setTag(CC_TREBLE_B);
+  connect(trebleB, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
+  connect(trebleB, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
 
-  // Channel B presence dial:
-  presenceB = new DTDial(group, CC_PRESENCE_B);
-  presenceB->setGeometry(460, 26, 32, 32);
-  connect(presenceB, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
-  label = new QLabel(group);
-  label->setText("Presence");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(444, 58, 64, 20);
+  presenceB = new QImageDial(this);
+  presenceB->getImage().load(":/images/knob_movie.png");
+  presenceB->getDisabledImage().load(":/images/knob_disabled.png");
+  presenceB->setFrameCount(61);
+  presenceB->setEnabled(true);
+  presenceB->setGeometry(x0 + 559, y0 + 336, 48, 48);
+  presenceB->setTag(CC_PRESENCE_B);
+  connect(presenceB, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
+  connect(presenceB, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
 
-  // Channel B volume dial:
-  volumeB = new DTDial(group, CC_VOLUME_B);
-  volumeB->setGeometry(524, 26, 32, 32);
-  connect(volumeB, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
-  label = new QLabel(group);
-  label->setText("Volume");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(508, 58, 64, 20);
+  volumeB = new QImageDial(this);
+  volumeB->getImage().load(":/images/knob_movie.png");
+  volumeB->getDisabledImage().load(":/images/knob_disabled.png");
+  volumeB->setFrameCount(61);
+  volumeB->setEnabled(true);
+  volumeB->setGeometry(x0 + 623, y0 + 336, 48, 48);
+  volumeB->setTag(CC_VOLUME_B);
+  connect(volumeB, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
+  connect(volumeB, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
 
-  // Channel B voice selector:
-  voiceB1 = new QRadioButton(group);
-  voiceB1->setText("I");
-  voiceB1->setGeometry(580, 26, 40, 25);
-  voiceB1->setChecked(true);
-  connect(voiceB1, SIGNAL(toggled(bool)), this, SLOT(voiceB1toggled(bool)));
-  voiceB2 = new QRadioButton(group);
-  voiceB2->setText("II");
-  voiceB2->setGeometry(620, 26, 40, 25);
-  connect(voiceB2, SIGNAL(toggled(bool)), this, SLOT(voiceB2toggled(bool)));
-  voiceB3 = new QRadioButton(group);
-  voiceB3->setText("III");
-  voiceB3->setGeometry(580, 51, 40, 25);
-  connect(voiceB3, SIGNAL(toggled(bool)), this, SLOT(voiceB3toggled(bool)));
-  voiceB4 = new QRadioButton(group);
-  voiceB4->setText("IV");
-  voiceB4->setGeometry(620, 51, 40, 25);
-  connect(voiceB4, SIGNAL(toggled(bool)), this, SLOT(voiceB4toggled(bool)));
-
-  // Group box for the channel B reverb values:
-  group = new QGroupBox(this);
-  group->setTitle("Reverb B");
-  group->setFlat(false);
-  group->setGeometry(235, menuBar()->height() + 212, 450, 92);
-
-  // Reverb B bypass switch:
-  reverbBypassB = new QCheckBox(group);
-  reverbBypassB->setText("Enabled");
-  connect(reverbBypassB, SIGNAL(stateChanged(int)), this, SLOT(reverbBypassBChanged(int)));
-  reverbBypassB->setGeometry(10, 22, 134, 22);
-
-  // Channel B reverb selector:
-  reverbB = new QComboBox(group);
+  reverbB = new QComboBox(this);
   reverbB->addItem("None");
   reverbB->addItem("Spring");
   reverbB->addItem("'63 Spring");
@@ -1187,180 +823,150 @@ void MainWindow::createEditArea()
   reverbB->addItem("Tile");
   reverbB->addItem("Echo");
   reverbB->addItem("Particle Verb");
-  reverbB->setGeometry(50, 53, 134, 22);
+  reverbB->setGeometry(x0 + 280, y0 + 270, 134, 22);
+  reverbB->setStyleSheet(comboStyle);
   connect(reverbB, SIGNAL(currentIndexChanged(int)), this, SLOT(reverbBChanged(int)));
-  label = new QLabel(group);
-  label->setText("Type");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(10, 58, 30, 20);
 
-  // Reverb B decay dial:
-  reverbDecayB = new DTDial(group, CC_REV_DECAY_B);
-  reverbDecayB->setGeometry(200, 26, 32, 32);
-  connect(reverbDecayB, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
-  label = new QLabel(group);
-  label->setText("Decay");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(184, 58, 64, 20);
+  reverbLedB = new QImageLED(this);
+  reverbLedB->getImage().load(":/images/led_yellow.png");
+  reverbLedB->getDisabledImage().load(":/images/led_yellow_disabled.png");
+  reverbLedB->setGeometry(x0 + 244, y0 + 232, 31, 31);
+  reverbLedB->setEnabled(true);
+  reverbLedB->setValue(true);
 
-  // Reverb B predelay dial:
-  reverbPredelayB = new DTDial(group, CC_REV_PREDELAY_B);
-  reverbPredelayB->setGeometry(264, 26, 32, 32);
-  connect(reverbPredelayB, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
-  label = new QLabel(group);
-  label->setText("Pre Delay");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(248, 58, 64, 20);
+  reverbBypassB = new QImageToggle(this);
+  reverbBypassB->setGeometry(x0 + 275, y0 + 232, 44, 31);
+  reverbBypassB->getImage().load(":/images/onoff.png");
+  reverbBypassB->getDisabledImage().load(":/images/onoff_disabled.png");
+  reverbBypassB->setEnabled(true);
+  reverbBypassB->setTag(CC_REV_BYPASS_B);
+  reverbBypassB->setLeftRight(true);
+  reverbBypassB->setValue(true);
+  connect(reverbBypassB, SIGNAL(valueChanged(QImageToggle*, bool)), this, SLOT(toggleChanged(QImageToggle*, bool)));
 
-  // Reverb B tone dial:
-  reverbToneB = new DTDial(group, CC_REV_TONE_B);
-  reverbToneB->setGeometry(328, 26, 32, 32);
-  connect(reverbToneB, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
-  label = new QLabel(group);
-  label->setText("Tone");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(312, 58, 64, 20);
+  reverbDecayB = new QImageDial(this);
+  reverbDecayB->getImage().load(":/images/knob_movie.png");
+  reverbDecayB->getDisabledImage().load(":/images/knob_disabled.png");
+  reverbDecayB->setFrameCount(61);
+  reverbDecayB->setEnabled(true);
+  reverbDecayB->setGeometry(x0 + 431, y0 + 235, 48, 48);
+  reverbDecayB->setTag(CC_REV_DECAY_B);
+  connect(reverbDecayB, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
+  connect(reverbDecayB, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
 
-  // Reverb B mix dial:
-  reverbMixB = new DTDial(group, CC_REV_MIX_B);
-  reverbMixB->setGeometry(394, 26, 32, 32);
-  connect(reverbMixB, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
-  label = new QLabel(group);
-  label->setText("Mix");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(378, 58, 64, 20);
+  reverbPredelayB = new QImageDial(this);
+  reverbPredelayB->getImage().load(":/images/knob_movie.png");
+  reverbPredelayB->getDisabledImage().load(":/images/knob_disabled.png");
+  reverbPredelayB->setFrameCount(61);
+  reverbPredelayB->setEnabled(true);
+  reverbPredelayB->setGeometry(x0 + 495, y0 + 235, 48, 48);
+  reverbPredelayB->setTag(CC_REV_PREDELAY_B);
+  connect(reverbPredelayB, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
+  connect(reverbPredelayB, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
 
-  // Group box for the channel B poweramp values:
-  group = new QGroupBox(this);
-  group->setTitle("Poweramp B");
-  group->setFlat(false);
-  group->setGeometry(700, menuBar()->height() + 212, 255, 194);
+  reverbToneB = new QImageDial(this);
+  reverbToneB->getImage().load(":/images/knob_movie.png");
+  reverbToneB->getDisabledImage().load(":/images/knob_disabled.png");
+  reverbToneB->setFrameCount(61);
+  reverbToneB->setEnabled(true);
+  reverbToneB->setGeometry(x0 + 559, y0 + 235, 48, 48);
+  reverbToneB->setTag(CC_REV_TONE_B);
+  connect(reverbToneB, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
+  connect(reverbToneB, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
 
-  // Channel B Class A/AB switch:
-  classB = new DTSlider(group, CC_CLASS_B);
-  classB->setGeometry(26, 40, 32, 28);
-  connect(classB, SIGNAL(valueChanged2(int, int)), this, SLOT(sliderChanged(int, int)));
-  label = new QLabel(group);
-  label->setText("Class A/B");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(10, 20, 64, 20);
-  label = new QLabel(group);
-  label->setText("Class A");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(10, 68, 64, 20);
+  reverbMixB = new QImageDial(this);
+  reverbMixB->getImage().load(":/images/knob_movie.png");
+  reverbMixB->getDisabledImage().load(":/images/knob_disabled.png");
+  reverbMixB->setFrameCount(61);
+  reverbMixB->setEnabled(true);
+  reverbMixB->setGeometry(x0 + 623, y0 + 235, 48, 48);
+  reverbMixB->setTag(CC_REV_MIX_B);
+  connect(reverbMixB, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
+  connect(reverbMixB, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
 
-  // Channel B Pentode/Triode switch:
-  xtodeB = new DTSlider(group, CC_XTODE_B);
-  xtodeB->setGeometry(196, 40, 32, 28);
-  connect(xtodeB, SIGNAL(valueChanged2(int, int)), this, SLOT(sliderChanged(int, int)));
-  label = new QLabel(group);
-  label->setText("Pentode");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(180, 20, 64, 20);
-  label = new QLabel(group);
-  label->setText("Triode");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(180, 68, 64, 20);
+  classB = new QImageToggle(this);
+  classB->setGeometry(x0 + 720, y0 + 227, 64, 88);
+  classB->getImage().load(":/images/class.png");
+  classB->getDisabledImage().load(":/images/class_disabled.png");
+  classB->setEnabled(true);
+  classB->setTag(CC_CLASS_B);
+  connect(classB, SIGNAL(valueChanged(QImageToggle*, bool)), this, SLOT(toggleChanged(QImageToggle*, bool)));
 
-  // Channel B topology selector:
-  topolB1 = new QRadioButton(group);
-  topolB1->setText("I");
-  topolB1->setGeometry(90, 18, 40, 25);
-  topolB1->setChecked(true);
-  connect(topolB1, SIGNAL(toggled(bool)), this, SLOT(topolB1toggled(bool)));
-  topolB2 = new QRadioButton(group);
-  topolB2->setText("II");
-  topolB2->setGeometry(130, 18, 40, 25);
-  connect(topolB2, SIGNAL(toggled(bool)), this, SLOT(topolB2toggled(bool)));
-  topolB3 = new QRadioButton(group);
-  topolB3->setText("III");
-  topolB3->setGeometry(90, 43, 40, 25);
-  connect(topolB3, SIGNAL(toggled(bool)), this, SLOT(topolB3toggled(bool)));
-  topolB4 = new QRadioButton(group);
-  topolB4->setText("IV");
-  topolB4->setGeometry(130, 43, 40, 25);
-  connect(topolB4, SIGNAL(toggled(bool)), this, SLOT(topolB4toggled(bool)));
-  label = new QLabel(group);
-  label->setText("Topology");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(90, 68, 80, 20);
+  topolB = new QImageToggle4(this);
+  topolB->setGeometry(x0 + 804, y0 + 242, 48, 48);
+  topolB->getImage().load(":/images/I_II_III_IV.png");
+  topolB->getDisabledImage().load(":/images/I_II_III_IV_disabled.png");
+  topolB->setEnabled(true);
+  topolB->setTag(CC_TOPOL_B);
+  connect(topolB, SIGNAL(valueChanged(QImageToggle4*, int)), this, SLOT(toggle4Changed(QImageToggle4*, int)));
 
-  // Channel B boost switch:
-  boostB = new DTSlider(group, CC_BOOST_B);
-  boostB->setGeometry(26, 132, 32, 28);
-  connect(boostB, SIGNAL(valueChanged2(int, int)), this, SLOT(sliderChanged(int, int)));
-  label = new QLabel(group);
-  label->setText("On");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(10, 112, 64, 20);
-  label = new QLabel(group);
-  label->setText("Boost");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(10, 160, 64, 20);
+  xtodeB = new QImageToggle(this);
+  xtodeB->setGeometry(x0 + 871, y0 + 227, 64, 88);
+  xtodeB->getImage().load(":/images/xtode.png");
+  xtodeB->getDisabledImage().load(":/images/xtode_disabled.png");
+  xtodeB->setEnabled(true);
+  xtodeB->setTag(CC_XTODE_B);
+  connect(xtodeB, SIGNAL(valueChanged(QImageToggle*, bool)), this, SLOT(toggleChanged(QImageToggle*, bool)));
 
-  // Channel B PI voltage switch:
-  pivoltB = new DTSlider(group, CC_PI_VOLTAGE_B);
-  pivoltB->setGeometry(110, 132, 32, 28);
-  connect(pivoltB, SIGNAL(valueChanged2(int, int)), this, SLOT(sliderChanged(int, int)));
-  label = new QLabel(group);
-  label->setText("PIV High");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(94, 112, 64, 20);
-  label = new QLabel(group);
-  label->setText("PIV Low");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(94, 160, 64, 20);
+  boostB = new QImageToggle(this);
+  boostB->setGeometry(x0 + 720, y0 + 316, 64, 88);
+  boostB->getImage().load(":/images/boost.png");
+  boostB->getDisabledImage().load(":/images/boost_disabled.png");
+  boostB->setEnabled(true);
+  boostB->setTag(CC_BOOST_B);
+  connect(boostB, SIGNAL(valueChanged(QImageToggle*, bool)), this, SLOT(toggleChanged(QImageToggle*, bool)));
 
-  // Channel B Cap X/Y switch:
-  capB = new DTSlider(group, CC_CAP_TYPE_B);
-  capB->setGeometry(196, 132, 32, 28);
-  connect(capB, SIGNAL(valueChanged2(int, int)), this, SLOT(sliderChanged(int,int)));
-  label = new QLabel(group);
-  label->setText("Tight");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(180, 112, 64, 20);
-  label = new QLabel(group);
-  label->setText("Smooth");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(180, 160, 64, 20);
+  pivoltB = new QImageToggle(this);
+  pivoltB->setGeometry(x0 + 795, y0 + 316, 64, 88);
+  pivoltB->getImage().load(":/images/piv.png");
+  pivoltB->getDisabledImage().load(":/images/piv_disabled.png");
+  pivoltB->setEnabled(true);
+  pivoltB->setTag(CC_PI_VOLTAGE_B);
+  connect(pivoltB, SIGNAL(valueChanged(QImageToggle*, bool)), this, SLOT(toggleChanged(QImageToggle*, bool)));
 
-  // Group box for the global values:
-  group = new QGroupBox(this);
-  group->setTitle("Master");
-  group->setFlat(false);
-  group->setGeometry(15, menuBar()->height() + 110, 205, 194);
+  capB = new QImageToggle(this);
+  capB->setGeometry(x0 + 871, y0 + 316, 64, 88);
+  capB->getImage().load(":/images/cap.png");
+  capB->getDisabledImage().load(":/images/cap_disabled.png");
+  capB->setEnabled(true);
+  capB->setTag(CC_CAP_TYPE_B);
+  connect(capB, SIGNAL(valueChanged(QImageToggle*, bool)), this, SLOT(toggleChanged(QImageToggle*, bool)));
 
-  // Channel switch:
-  channel = new DTSlider(group, CC_CHANNEL);
-  channel->setGeometry(46, 55, 32, 28);
-  channel->setReversed();
-  connect(channel, SIGNAL(valueChanged2(int, int)), this, SLOT(sliderChanged(int, int)));
-  label = new QLabel(group);
-  label->setText("Channel A");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(30, 35, 64, 20);
-  label = new QLabel(group);
-  label->setText("Channel B");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(30, 83, 64, 20);
+  channel = new QImageToggle(this);
+  channel->setGeometry(x0 + 39, y0 + 137, 64, 88);
+  channel->getImage().load(":/images/channel.png");
+  channel->getDisabledImage().load(":/images/channel_disabled.png");
+  channel->setEnabled(true);
+  channel->setTag(CC_CHANNEL);
+  connect(channel, SIGNAL(valueChanged(QImageToggle*, bool)), this, SLOT(toggleChanged(QImageToggle*, bool)));
 
-  // Master volume dial:
-  master = new DTDial(group, CC_MASTER_VOL);
-  master->setGeometry(130, 51, 32, 32);
-  connect(master, SIGNAL(valueChanged2(int, int)), this, SLOT(dialChanged(int, int)));
-  label = new QLabel(group);
-  label->setText("Volume");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(114, 83, 64, 20);
+  master = new QImageDial(this);
+  master->getImage().load(":/images/knob_movie.png");
+  master->getDisabledImage().load(":/images/knob_disabled.png");
+  master->setFrameCount(61);
+  master->setEnabled(true);
+  master->setGeometry(x0 + 140, y0 + 152, 48, 48);
+  master->setTag(CC_MASTER_VOL);
+  connect(master, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
+  connect(master, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
 
-  // Low volume mode switch:
-  lowVol = new QCheckBox(group);
-  lowVol->setText("Low Volume Mode");
-  connect(lowVol, SIGNAL(stateChanged(int)), this, SLOT(lowVolChanged(int)));
-  lowVol->setGeometry(10, 125, 134, 22);
+  lowVolLed = new QImageLED(this);
+  lowVolLed->getImage().load(":/images/led_red.png");
+  lowVolLed->getDisabledImage().load(":/images/led_red_disabled.png");
+  lowVolLed->setGeometry(x0 + 171, y0 + 232, 31, 31);
+  lowVolLed->setEnabled(true);
 
-  // Master mic selector:
-  mic = new QComboBox(group);
+  lowVol = new QImageToggle(this);
+  lowVol->setGeometry(x0 + 37, y0 + 232, 44, 31);
+  lowVol->getImage().load(":/images/onoff.png");
+  lowVol->getDisabledImage().load(":/images/onoff_disabled.png");
+  lowVol->setEnabled(true);
+  lowVol->setTag(CC_LOWVOLUME);
+  lowVol->setLeftRight(true);
+  lowVol->setValue(true);
+  connect(lowVol, SIGNAL(valueChanged(QImageToggle*, bool)), this, SLOT(toggleChanged(QImageToggle*, bool)));
+
+  mic = new QComboBox(this);
   mic->addItem("None");
   mic->addItem("57 Dynamic");
   mic->addItem("57 Dynamic, Off Axis");
@@ -1370,12 +976,23 @@ void MainWindow::createEditArea()
   mic->addItem("121 Ribbon");
   mic->addItem("67 Condenser");
   mic->addItem("87 Condenser");
-  mic->setGeometry(50, 156, 134, 22);
+  mic->setGeometry(x0 + 62, y0 + 270, 134, 22);
+  mic->setStyleSheet(comboStyle);
   connect(mic, SIGNAL(currentIndexChanged(int)), this, SLOT(micChanged(int)));
-  label = new QLabel(group);
-  label->setText("Mic");
-  label->setAlignment(Qt::AlignHCenter);
-  label->setGeometry(10, 161, 30, 20);
+
+  QImageButton* midiButton = new QImageButton(this);
+  midiButton->setGeometry(x0 + 11, y0 - 18, 65, 15);
+  midiButton->getImage().load(":/images/midi.png");
+  midiButton->getDisabledImage().load(":/images/midi_disabled.png");
+  midiButton->setEnabled(true);
+  connect(midiButton, SIGNAL(clicked(QImageButton*)), this, SLOT(setupMIDI(QImageButton*)));
+
+  QImageButton* aboutButton = new QImageButton(this);
+  aboutButton->setGeometry(x0 + 80, y0 - 18, 65, 15);
+  aboutButton->getImage().load(":/images/about.png");
+  aboutButton->getDisabledImage().load(":/images/about_disabled.png");
+  aboutButton->setEnabled(true);
+  connect(aboutButton, SIGNAL(clicked(QImageButton*)), this, SLOT(about(QImageButton*)));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1441,24 +1058,13 @@ void MainWindow::sendBlockMessage(bool block)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// MainWindow::exitApplication()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the Exit-Application signal.
-///\remarks Closes the window and quits the application.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::exitApplication()
-{
-  // Close this window:
-  close();
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // MainWindow::about()
 ////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the Help->About signal.
+///\brief   Handler for the about buton signal.
+///\param   [in] sender: The sending control.
 ///\remarks Shows an about box with informations about this application.
 ////////////////////////////////////////////////////////////////////////////////
-void MainWindow::about()
+void MainWindow::about(QImageButton* sender)
 {
   // Create about box:
   AboutDialog dlg(this);
@@ -1469,9 +1075,10 @@ void MainWindow::about()
 // MainWindow::setupMIDI()
 ////////////////////////////////////////////////////////////////////////////////
 ///\brief   Handler for the File->Setup signal.
+///\param   [in] sender: The sending control.
 ///\remarks Shows the MIDI setup dialog.
 ////////////////////////////////////////////////////////////////////////////////
-void MainWindow::setupMIDI()
+void MainWindow::setupMIDI(QImageButton* sender)
 {
   while (true)
   {
@@ -1493,15 +1100,99 @@ void MainWindow::setupMIDI()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// MainWindow::ignoreMasterChange()
+// MainWindow::rotaryChanged()
 ////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the ignore master menu entry checked changed event.
-///\param   [in] checked: New checked state of the menu entry.
+///\brief   Handler for the dial changed event.
+///\param   [in] sender: The sending control.
+///\param   [in] newVal: The new value.
 ////////////////////////////////////////////////////////////////////////////////
-void MainWindow::ignoreMasterChanged(bool checked)
+void MainWindow::rotaryChanged(QImageDial* sender, double newVal)
 {
-  // Enable/disable master knob:
-  master->setEnabled(!checked);
+  // Is the UI locked?
+  if (blocked)
+    return;
+
+  // Block user interface:
+  sendBlockMessage(true);
+
+  // Send the value:
+  sendControlChange(DT_MIDI_CHANNEL, sender->getTag(), (int)(newVal * 127.0) & 0xFF);
+
+  // Release the user interface:
+  sendBlockMessage(false);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// MainWindow::rotaryReleased()
+////////////////////////////////////////////////////////////////////////////////
+///\brief   Handler for the dial released event.
+///\param   [in] sender: The sending control.
+////////////////////////////////////////////////////////////////////////////////
+void MainWindow::rotaryReleased(QImageDial* /* sender */)
+{
+  // Release the user interface:
+  sendBlockMessage(false);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// MainWindow::toggleChanged()
+////////////////////////////////////////////////////////////////////////////////
+///\brief   Handler for the toggle changed event.
+///\param   [in] sender: The sending control.
+///\param   [in] newVal: The new value.
+////////////////////////////////////////////////////////////////////////////////
+void MainWindow::toggleChanged(QImageToggle* sender, bool newVal)
+{
+  // Is the UI locked?
+  if (blocked)
+    return;
+
+  // Block user interface:
+  sendBlockMessage(true);
+
+  // Send the value:
+  if (sender->getTag() == CC_CHANNEL || sender->getTag() == CC_LOWVOLUME)
+    sendControlChange(DT_MIDI_CHANNEL, sender->getTag(), newVal ? : 127);
+  else
+    sendControlChange(DT_MIDI_CHANNEL, sender->getTag(), newVal ? 127 : 0);
+
+  // Release the user interface:
+  sendBlockMessage(false);
+
+  // Update LEDs if needed:
+  if (sender->getTag() == CC_REV_BYPASS_A)
+    reverbLedA->setValue(newVal);
+  else if (sender->getTag() == CC_REV_BYPASS_B)
+    reverbLedB->setValue(newVal);
+  if (sender->getTag() == CC_LOWVOLUME)
+    lowVolLed->setValue(!newVal);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// MainWindow::toggle4Changed()
+////////////////////////////////////////////////////////////////////////////////
+///\brief   Handler for the toggle changed event.
+///\param   [in] sender: The sending control.
+///\param   [in] newVal: The new value.
+////////////////////////////////////////////////////////////////////////////////
+void MainWindow::toggle4Changed(QImageToggle4* sender, int newVal)
+{
+  // Is the UI locked?
+  if (blocked)
+    return;
+
+  // Block user interface:
+  sendBlockMessage(true);
+
+  // Send the value:
+  sendControlChange(DT_MIDI_CHANNEL, sender->getTag(), newVal);
+
+  // Release the user interface:
+  sendBlockMessage(false);
+
+  // Sync state:
+  if (sender->getTag() == CC_VOICE_A || sender->getTag() == CC_VOICE_B)
+    getValuesFromDT();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1517,7 +1208,7 @@ void MainWindow::ampAChanged(int value)
     return;
 
   // Load the amp's defaults too?
-  if (defaultsAction->isChecked())
+  if (!(QApplication::keyboardModifiers() & Qt::ShiftModifier))
   {
     // Block user interface:
     sendBlockMessage(true);
@@ -1566,174 +1257,6 @@ void MainWindow::cabAChanged(int value)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// MainWindow::dialChanged()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the dial changed event.
-///\param   [in] controlID: Control channel of the dial.
-///\param   [in] value:     New value of the dial.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::dialChanged(int controlID, int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, controlID, value);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::sliderChanged()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the slider changed event.
-///\param   [in] controlID: Control channel of the slider.
-///\param   [in] value:     New value of the slider.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::sliderChanged(int controlID, int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, controlID, value);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::voiceA1toggled()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the voice A1 radio button toggle event.
-///\param   [in] checked: New state of the button.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::voiceA1toggled(bool checked)
-{
-  // Is the UI locked?
-  if (blocked || !checked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_VOICE_A, 0);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-
-  // Sync state:
-  getValuesFromDT();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::voiceA2toggled()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the voice A2 radio button toggle event.
-///\param   [in] checked: New state of the button.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::voiceA2toggled(bool checked)
-{
-  // Is the UI locked?
-  if (blocked || !checked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_VOICE_A, 1);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-
-  // Sync state:
-  getValuesFromDT();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::voiceA3toggled()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the voice A3 radio button toggle event.
-///\param   [in] checked: New state of the button.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::voiceA3toggled(bool checked)
-{
-  // Is the UI locked?
-  if (blocked || !checked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_VOICE_A, 2);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-
-  // Sync state:
-  getValuesFromDT();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::voiceA4toggled()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the voice A4 radio button toggle event.
-///\param   [in] checked: New state of the button.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::voiceA4toggled(bool checked)
-{
-  // Is the UI locked?
-  if (blocked || !checked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_VOICE_A, 3);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-
-  // Sync state:
-  getValuesFromDT();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::reverbBypassAChanged()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the reverb A bypass checkbox change event.
-///\param   [in] value: New state of the box.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::reverbBypassAChanged(int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_REV_BYPASS_A, value == Qt::Checked ? 127 : 0);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // MainWindow::reverbAChanged()
 ////////////////////////////////////////////////////////////////////////////////
 ///\brief   Handler for the reverb A combo box selection changed event.
@@ -1755,96 +1278,6 @@ void MainWindow::reverbAChanged(int value)
   sendBlockMessage(false);
 }
 
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::topolA2toggled()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the cap X/Y slider changed event.
-///\param   [in] value: New value of the slider.
-///\remarks The slider value can only be 0 and 1 so it's working as a switch.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::topolA1toggled(bool checked)
-{
-  // Is the UI locked?
-  if (blocked || !checked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_TOPOL_A, 0);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::topolA2toggled()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the topology A2 radio button toggle event.
-///\param   [in] checked: New state of the button.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::topolA2toggled(bool checked)
-{
-  // Is the UI locked?
-  if (blocked || !checked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_TOPOL_A, 1);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::topolA3toggled()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the topology A3 radio button toggle event.
-///\param   [in] checked: New state of the button.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::topolA3toggled(bool checked)
-{
-  // Is the UI locked?
-  if (blocked || !checked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_TOPOL_A, 2);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::topolA4toggled()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the topology A4 radio button toggle event.
-///\param   [in] checked: New state of the button.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::topolA4toggled(bool checked)
-{
-  // Is the UI locked?
-  if (blocked || !checked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_TOPOL_A, 3);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 // MainWindow::ampBChanged()
 ////////////////////////////////////////////////////////////////////////////////
@@ -1857,7 +1290,8 @@ void MainWindow::ampBChanged(int value)
   if (blocked)
     return;
 
-  if (defaultsAction->isChecked())
+  // Load the amp's defaults too?
+  if (!(QApplication::keyboardModifiers() & Qt::ShiftModifier))
   {
     // Block user interface:
     sendBlockMessage(true);
@@ -1906,126 +1340,6 @@ void MainWindow::cabBChanged(int value)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// MainWindow::voiceB1toggled()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the voice B1 radio button toggle event.
-///\param   [in] checked: New state of the button.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::voiceB1toggled(bool checked)
-{
-  // Is the UI locked?
-  if (blocked || !checked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_VOICE_B, 0);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-
-  // Sync state:
-  getValuesFromDT();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::voiceB2toggled()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the voice B2 radio button toggle event.
-///\param   [in] checked: New state of the button.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::voiceB2toggled(bool checked)
-{
-  // Is the UI locked?
-  if (blocked || !checked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_VOICE_B, 1);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-
-  // Sync state:
-  getValuesFromDT();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::voiceB3toggled()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the voice B3 radio button toggle event.
-///\param   [in] checked: New state of the button.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::voiceB3toggled(bool checked)
-{
-  // Is the UI locked?
-  if (blocked || !checked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_VOICE_B, 2);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-
-  // Sync state:
-  getValuesFromDT();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::voiceB4toggled()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the voice B4 radio button toggle event.
-///\param   [in] checked: New state of the button.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::voiceB4toggled(bool checked)
-{
-  // Is the UI locked?
-  if (blocked || !checked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_VOICE_B, 3);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-  getValuesFromDT();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::reverbBypassBChanged()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the reverb B bypass checkbox change event.
-///\param   [in] value: New state of the box.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::reverbBypassBChanged(int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_REV_BYPASS_B, value == Qt::Checked ? 127 : 0);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // MainWindow::reverbBChanged()
 ////////////////////////////////////////////////////////////////////////////////
 ///\brief   Handler for the reverb B combo box selection changed event.
@@ -2048,94 +1362,6 @@ void MainWindow::reverbBChanged(int value)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// MainWindow::topolB1toggled()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the topology B1 radio button toggle event.
-///\param   [in] checked: New state of the button.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::topolB1toggled(bool checked)
-{
-  // Is the UI locked?
-  if (blocked || !checked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_TOPOL_B, 0);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::topolB2toggled()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the topology B2 radio button toggle event.
-///\param   [in] checked: New state of the button.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::topolB2toggled(bool checked)
-{
-  // Is the UI locked?
-  if (blocked || !checked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_TOPOL_B, 1);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::topolB3toggled()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the topology B3 radio button toggle event.
-///\param   [in] checked: New state of the button.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::topolB3toggled(bool checked)
-{
-  // Is the UI locked?
-  if (blocked || !checked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_TOPOL_B, 2);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::topolB4toggled()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the topology B4 radio button toggle event.
-///\param   [in] checked: New state of the button.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::topolB4toggled(bool checked)
-{
-  // Is the UI locked?
-  if (blocked || !checked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_TOPOL_B, 3);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // MainWindow::micChanged()
 ////////////////////////////////////////////////////////////////////////////////
 ///\brief   Handler for the mic combo box selection changed event.
@@ -2152,28 +1378,6 @@ void MainWindow::micChanged(int value)
 
   // Send the value:
   sendControlChange(DT_MIDI_CHANNEL, CC_XLR_MIC, value);
-
-  // Release the user interface:
-  sendBlockMessage(false);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// MainWindow::lowVolChanged()
-////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the low volume checkbox change event.
-///\param   [in] value: New state of the box.
-////////////////////////////////////////////////////////////////////////////////
-void MainWindow::lowVolChanged(int value)
-{
-  // Is the UI locked?
-  if (blocked)
-    return;
-
-  // Block user interface:
-  sendBlockMessage(true);
-
-  // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, CC_LOWVOLUME, value == Qt::Checked ? 127 : 0);
 
   // Release the user interface:
   sendBlockMessage(false);

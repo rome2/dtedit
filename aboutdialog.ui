@@ -14,7 +14,7 @@
    <string>About dtedit</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="dtedit.qrc">
+   <iconset>
     <normaloff>:/images/qt.png</normaloff>:/images/qt.png</iconset>
   </property>
   <widget class="QDialogButtonBox" name="buttonBox">
@@ -76,7 +76,7 @@
     <property name="text">
      <string>DT Edit - A DT Amp Editor
 
-Version 1.0.3, Dec 7th 2012</string>
+Version 1.1.0, Jan 3rd 2013</string>
     </property>
     <property name="textFormat">
      <enum>Qt::PlainText</enum>

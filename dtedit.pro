@@ -23,8 +23,11 @@ HEADERS  += mainwindow.h \
     aboutdialog.h \
     dtedit.h \
     mainmidiwindow.h \
-    dtdial.h \
-    dtslider.h
+    qimagedial.h \
+    qimagetoggle.h \
+    qimageled.h \
+    qimagetoggle4.h \
+    qimagebutton.h
 
 win* {
     DEFINES += __WINDOWS_MM__

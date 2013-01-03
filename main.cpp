@@ -43,9 +43,6 @@ int main(int argc, char** argv)
   // Init the global application object:
   QApplication a(argc, argv);
 
-  // Force plastique style:
-  a.setStyle(new QPlastiqueStyle());
-
   // Set programm properties, used by QSettings and others:
   a.setApplicationName   (QString("DTEdit"));
   a.setApplicationVersion(QString("1.0"));
