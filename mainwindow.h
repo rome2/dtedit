@@ -113,10 +113,11 @@ private:
   // MainWindow::getValuesFromDT()
   //////////////////////////////////////////////////////////////////////////////
   ///\brief   Sync UI with the values from the actual DT.
+  ///\param   [in] async: Is this called asyncally?
   ///\remarks This functions sends value request CCs to the DT. The UI is then
   ///         updated by the CC receive function.
   //////////////////////////////////////////////////////////////////////////////
-  void getValuesFromDT();
+  void getValuesFromDT(bool async = false);
 
   //////////////////////////////////////////////////////////////////////////////
   // MainWindow::sendBlockMessage()
@@ -296,6 +297,7 @@ private:
   QImageDial*    master;          ///\> Master volume.
   QImage         backPic;         ///\> Main background image.
   bool           blocked;         ///\> UI udate blocking flag.
+  QMutex         receiveMutex;    ///\> Mutex to avoid endless recursion.
 };
 
 #endif // #ifndef __MAINWINDOW_H_INCLUDED__

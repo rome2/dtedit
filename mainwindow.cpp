@@ -93,8 +93,6 @@ MainWindow::~MainWindow()
 ////////////////////////////////////////////////////////////////////////////////
 void MainWindow::closeEvent(QCloseEvent* e)
 {
-  //TODO: Check for unsaved documents etc.
-
   // Save window position:
   QSettings settings;
   QRect rc = geometry();
@@ -172,6 +170,12 @@ void MainWindow::controlChangeReceived(unsigned char channel, unsigned char cont
   if (controlNumber == 127)
     blocked = value >= 64;
 
+  // Get receiving state. If this is true then we are currently be called by a
+  // getValuesFromDT() request.
+  static bool receiving = false;
+  if (controlNumber == 126)
+    receiving = value >= 64;
+
   // UI locked?
   if (blocked)
     return;
@@ -220,9 +224,14 @@ void MainWindow::controlChangeReceived(unsigned char channel, unsigned char cont
     volumeA->blockSignals(oldState);
     break;
   case CC_VOICE_A:
-    oldState = voiceA->blockSignals(true);
-    voiceA->setValue(value);
-    voiceA->blockSignals(oldState);
+    if (voiceA->getValue() != value)
+    {
+      oldState = voiceA->blockSignals(true);
+      voiceA->setValue(value);
+      voiceA->blockSignals(oldState);
+      if (!receiving)
+        getValuesFromDT(true);
+    }
     break;
   case CC_REV_BYPASS_A:
     oldState = reverbBypassA->blockSignals(true);
@@ -328,9 +337,14 @@ void MainWindow::controlChangeReceived(unsigned char channel, unsigned char cont
     volumeB->blockSignals(oldState);
     break;
   case CC_VOICE_B:
-    oldState = voiceB->blockSignals(true);
-    voiceB->setValue(value);
-    voiceB->blockSignals(oldState);
+    if (voiceB->getValue() != value)
+    {
+      oldState = voiceB->blockSignals(true);
+      voiceB->setValue(value);
+      voiceB->blockSignals(oldState);
+      if (!receiving)
+        getValuesFromDT(true);
+    }
     break;
   case CC_REV_BYPASS_B:
     oldState = reverbBypassB->blockSignals(true);
@@ -999,14 +1013,24 @@ void MainWindow::createEditArea()
 // MainWindow::getValuesFromDT()
 ////////////////////////////////////////////////////////////////////////////////
 ///\brief   Sync UI with the values from the actual DT.
+///\param   [in] async: Is this called asyncally?
 ///\remarks This functions sends value request CCs to the DT. The UI is then
 ///         updated by the CC receive function.
 ////////////////////////////////////////////////////////////////////////////////
-void MainWindow::getValuesFromDT()
+void MainWindow::getValuesFromDT(bool async)
 {
+  // Avoid recursion:
+  if (!receiveMutex.tryLock())
+    return;
+
   // Lock UI:
-  this->setEnabled(false);
-  this->setCursor(Qt::WaitCursor);
+  if (!async)
+  {
+    this->setEnabled(false);
+    this->setCursor(Qt::WaitCursor);
+  }
+
+  sendControlChange(DT_MIDI_CHANNEL, 126, 127);
 
   // Send parameter requests:
   Sleep(50);
@@ -1036,9 +1060,17 @@ void MainWindow::getValuesFromDT()
   // Force user interface release:
   sendBlockMessage(false);
 
-  // Release UI
-  this->setCursor(Qt::ArrowCursor);
-  this->setEnabled(true);
+  // Release UI:
+  if (!async)
+  {
+    this->setCursor(Qt::ArrowCursor);
+    this->setEnabled(true);
+  }
+
+  sendControlChange(DT_MIDI_CHANNEL, 126, 0);
+
+  // Release mutex:
+  receiveMutex.unlock();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
