@@ -1,0 +1,16 @@
+syntax: glob
+debug/*
+release/*
+docs/*
+screenshots/*
+ui_*.h
+*.user
+Makefile*
+setup/bin/*
+setup/bootstrapper/obj/*
+setup/database/obj/*
+*.suo
+releases/*
+object_script.*
+*.user.*
+setup_vs2008/Release/*

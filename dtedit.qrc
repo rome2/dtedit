@@ -1,0 +1,33 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/dtedit.png</file>
+        <file>images/dtedit64.png</file>
+        <file>images/back.png</file>
+        <file>images/knob_movie.png</file>
+        <file>images/knob_disabled.png</file>
+        <file>images/boost.png</file>
+        <file>images/boost_disabled.png</file>
+        <file>images/cap.png</file>
+        <file>images/cap_disabled.png</file>
+        <file>images/class.png</file>
+        <file>images/class_disabled.png</file>
+        <file>images/led_red.png</file>
+        <file>images/led_yellow.png</file>
+        <file>images/onoff.png</file>
+        <file>images/onoff_disabled.png</file>
+        <file>images/piv.png</file>
+        <file>images/piv_disabled.png</file>
+        <file>images/xtode.png</file>
+        <file>images/xtode_disabled.png</file>
+        <file>images/channel.png</file>
+        <file>images/channel_disabled.png</file>
+        <file>images/led_red_disabled.png</file>
+        <file>images/led_yellow_disabled.png</file>
+        <file>images/I_II_III_IV.png</file>
+        <file>images/I_II_III_IV_disabled.png</file>
+        <file>images/about.png</file>
+        <file>images/about_disabled.png</file>
+        <file>images/midi.png</file>
+        <file>images/midi_disabled.png</file>
+    </qresource>
+</RCC>
