@@ -91,6 +91,15 @@ protected:
   void paintEvent(QPaintEvent* e);
 
   //////////////////////////////////////////////////////////////////////////////
+  // MainWindow::openMIDIPorts()
+  //////////////////////////////////////////////////////////////////////////////
+  ///\brief   Open the MIDI devices for input/output.
+  ///\return  Returns true if successfull or false otherwise.
+  ///\remarks Always closes the port priot trying to open them again.
+  //////////////////////////////////////////////////////////////////////////////
+  virtual bool openMIDIPorts();
+
+  //////////////////////////////////////////////////////////////////////////////
   // MainWindow::controlChangeReceived()
   //////////////////////////////////////////////////////////////////////////////
   ///\brief   This is called when a new control change message arrives.
@@ -99,6 +108,15 @@ protected:
   ///\param   [in] value:         Control value.
   //////////////////////////////////////////////////////////////////////////////
   virtual void controlChangeReceived(unsigned char channel, unsigned char controlNumber, unsigned char value);
+
+  //////////////////////////////////////////////////////////////////////////////
+  // MainWindow::sysExReceived()
+  //////////////////////////////////////////////////////////////////////////////
+  ///\brief   This is called when a new SysEx message arrives.
+  ///\param   [in] buff: The message buffer.
+  ///\param   [in] value:      Pressure value.
+  //////////////////////////////////////////////////////////////////////////////
+  virtual void sysExReceived(const std::vector<unsigned char>& buff);
 
 private:
 
@@ -298,6 +316,7 @@ private:
   QImage         backPic;         ///\> Main background image.
   bool           blocked;         ///\> UI udate blocking flag.
   QMutex         receiveMutex;    ///\> Mutex to avoid endless recursion.
+  QString        versionString;   ///\> Holds the current amp version.
 };
 
 #endif // #ifndef __MAINWINDOW_H_INCLUDED__
