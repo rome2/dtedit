@@ -139,6 +139,12 @@ void MainWindow::showEvent(QShowEvent* /*e*/)
 ////////////////////////////////////////////////////////////////////////////////
 void MainWindow::paintEvent(QPaintEvent* e)
 {
+  // Update title:
+  if (!versionString.isEmpty())
+    setWindowTitle("DT Edit (connected to " + versionString + ")");
+  else
+    setWindowTitle("DT Edit (not connected)");
+
   // Do we have a background image?
   if (backPic.isNull())
   {
@@ -150,6 +156,37 @@ void MainWindow::paintEvent(QPaintEvent* e)
   // Draw the back pic:
   QPainter qp(this);
   qp.drawImage(0, 0, backPic);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// MainWindow::openMIDIPorts()
+////////////////////////////////////////////////////////////////////////////////
+///\brief   Open the MIDI devices for input/output.
+///\return  Returns true if successfull or false otherwise.
+///\remarks Always closes the port priot trying to open them again.
+////////////////////////////////////////////////////////////////////////////////
+bool MainWindow::openMIDIPorts()
+{
+  // Reset version display:
+  versionString = "";
+
+  // Base class handling:
+  if (!MainMIDIWindow::openMIDIPorts())
+    return false;
+
+  // Send "identify yourself!" string:
+  std::vector<unsigned char> buff;
+  buff.reserve(6);
+  buff.push_back(0xF0);
+  buff.push_back(0x7E);
+  buff.push_back(0x7F);
+  buff.push_back(0x06);
+  buff.push_back(0x01);
+  buff.push_back(0xF7);
+  midiOut.sendMessage(&buff);
+
+  // Return success:
+  return true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -432,6 +469,65 @@ void MainWindow::controlChangeReceived(unsigned char channel, unsigned char cont
     master->setValue(value / 127.0);
     master->blockSignals(oldState);
     break;
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// MainWindow::sysExReceived()
+////////////////////////////////////////////////////////////////////////////////
+///\brief   This is called when a new SysEx message arrives.
+///\param   [in] buff: The message buffer.
+///\param   [in] value:      Pressure value.
+////////////////////////////////////////////////////////////////////////////////
+void MainWindow::sysExReceived(const std::vector<unsigned char>& buff)
+{
+  // Check size and type:
+  if (buff.size() == 17 && buff[0] == 0xF0)
+  {
+    // Check header
+    if (buff[1] != 0x7E || buff[2] != 0x7F || buff[3] != 0x06 || buff[4] != 0x02)
+      return;
+    if (buff[5] != 0x00 || buff[6] != 0x01 || buff[7] != 0x0C)
+      return;
+
+    // Check device:
+    if (buff[8] != 0x15 && buff[9] != 0x00)
+      return;
+
+    // Get model:
+    int model = buff[10];
+    switch (model)
+    {
+    case 0:
+      versionString = "DT50 1x12 Combo";
+      break;
+    case 1:
+      versionString = "DT50 212 Combo";
+      break;
+    case 2:
+      versionString = "DT50 Head";
+      break;
+    case 3:
+      versionString = "DT25 1x12 Combo";
+      break;
+    case 4:
+      versionString = "DT25 Head";
+      break;
+    default:
+      versionString = "Unknown DT model";
+      break;
+    }
+
+    // Add version:
+    versionString += " v";
+    //versionString += (char)buff[12]; // Leading space. Add again if firmware version reaches 10.00
+    versionString += (char)buff[13];
+    versionString += '.';
+    versionString += (char)buff[14];
+    versionString += (char)buff[15];
+
+    // Force a redraw:
+    update();
   }
 }
 
