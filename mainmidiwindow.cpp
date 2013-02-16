@@ -272,7 +272,7 @@ void MainMIDIWindow::polyAftertouchReceived(unsigned char /*channel*/, unsigned 
 ///\param   [in] buff: The message buffer.
 ///\param   [in] value:      Pressure value.
 ////////////////////////////////////////////////////////////////////////////////
-void MainMIDIWindow::sysExReceived(const std::vector<unsigned char>& /*buff*/)
+void MainMIDIWindow::sysExReceived(const std::vector<unsigned char>& buff)
 {
   // Log message:
   //QString s;
@@ -487,7 +487,7 @@ void MainMIDIWindow::onMIDIMessage(const double /* timeStamp */, const std::vect
 
   // SysEx?
   else if (status == 0xF0)
-    return;
+    sysExReceived(message);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
