@@ -540,7 +540,11 @@ void MainWindow::createEditArea()
 {
   int x0 = 0;
   int y0 = 22;
+  #ifdef __LINUX_ALSA__
+  QString comboStyle("QComboBox { border: 1px solid black; }");
+  #else
   QString comboStyle("QComboBox { background: #202020; color: white; border: 1px solid #606060; }");
+  #endif
 
   voiceA = new QImageToggle4(this);
   voiceA->setGeometry(x0 + 34, y0 + 30, 48, 48);
@@ -1192,7 +1196,7 @@ void MainWindow::sendBlockMessage(bool block)
 ///\param   [in] sender: The sending control.
 ///\remarks Shows an about box with informations about this application.
 ////////////////////////////////////////////////////////////////////////////////
-void MainWindow::about(QImageButton* sender)
+void MainWindow::about(QImageButton* /* sender */)
 {
   // Create about box:
   AboutDialog dlg(this);
@@ -1206,7 +1210,7 @@ void MainWindow::about(QImageButton* sender)
 ///\param   [in] sender: The sending control.
 ///\remarks Shows the MIDI setup dialog.
 ////////////////////////////////////////////////////////////////////////////////
-void MainWindow::setupMIDI(QImageButton* sender)
+void MainWindow::setupMIDI(QImageButton* /* sender */)
 {
   while (true)
   {
