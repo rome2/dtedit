@@ -76,7 +76,7 @@
     <property name="text">
      <string>DT Edit - A DT Amp Editor
 
-Version 1.1.0, Jan 3rd 2013</string>
+Version 1.1.1, Mar 7th 2013</string>
     </property>
     <property name="textFormat">
      <enum>Qt::PlainText</enum>
