@@ -27,7 +27,8 @@ HEADERS  += mainwindow.h \
     qimagetoggle.h \
     qimageled.h \
     qimagetoggle4.h \
-    qimagebutton.h
+    qimagebutton.h \
+    qimagewidget.h
 
 win* {
     DEFINES += __WINDOWS_MM__

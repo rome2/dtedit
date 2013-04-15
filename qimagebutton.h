@@ -25,14 +25,14 @@
 #ifndef __QIMAGEBUTTON_H_INCLUDED__
 #define __QIMAGEBUTTON_H_INCLUDED__
 
-#include <QtGui>
+#include "qimagewidget.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 ///\class QImageButton qimagebutton.h
 ///\brief -
 ////////////////////////////////////////////////////////////////////////////////
 class QImageButton :
-  public QWidget
+  public QImageWidget
 {
   Q_OBJECT// Qt magic...
 
@@ -46,8 +46,8 @@ public:
   ///\remarks Just initializes the members.
   //////////////////////////////////////////////////////////////////////////////
   QImageButton(QWidget* parent = 0) :
-    QWidget(parent),
-    down(false)
+    QImageWidget(parent),
+    m_down(false)
   {
     // Nothing to do here.
   }
@@ -63,142 +63,22 @@ public:
     // Nothing to do here.
   }
 
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageButton::getImage()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Get accessor for the Image property.
-  ///\return  The current image.
-  ///\remarks This image is the source for the toggle. It must contain two sub
-  ///         pictures ordered from left to right.
-  //////////////////////////////////////////////////////////////////////////////
-  QImage& getImage()
-  {
-    // Return our image:
-    return image;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageButton::getImage()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Get accessor for the Image property, const version.
-  ///\return  The current image.
-  ///\remarks This image is the source for the toggle. It must contain two sub
-  ///         pictures ordered from left to right.
-  //////////////////////////////////////////////////////////////////////////////
-  const QImage& getImage() const
-  {
-    // Return our image:
-    return image;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageButton::getDisabledImage()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Get accessor for the DisabledImage property.
-  ///\return  The current disabled state image.
-  ///\remarks This image is shown when the widget is disabled. It should have
-  ///         the same size as one frame of the toggle image.
-  //////////////////////////////////////////////////////////////////////////////
-  QImage& getDisabledImage()
-  {
-    // Return our image:
-    return disabledImage;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageButton::getDisabledImage()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Get accessor for the DisabledImage property, const version.
-  ///\return  The current disabled state image.
-  ///\remarks This image is shown when the widget is disabled. It should have
-  ///         the same size as one frame of the toggle image.
-  //////////////////////////////////////////////////////////////////////////////
-  const QImage& getDisabledImage() const
-  {
-    // Return our image:
-    return disabledImage;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageButton::getTag()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Get accessor for the Tag property.
-  ///\return  The currently stored user value.
-  ///\remarks This tag is an arbitrary user defined value.
-  //////////////////////////////////////////////////////////////////////////////
-  int getTag() const
-  {
-    // Return current tag:
-    return tag;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageButton::setTag()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Set accessor for the Tag property.
-  ///\param   [in] newTag: The new user defined value.
-  ///\remarks This tag is an arbitrary user defined value.
-  //////////////////////////////////////////////////////////////////////////////
-  void setTag(const int newTag)
-  {
-    // Set new tag:
-    tag = newTag;
-  }
-
 signals:
 
   //////////////////////////////////////////////////////////////////////////////
   // QImageButton::clicked()
   //////////////////////////////////////////////////////////////////////////////
-  ///\brief   This signal is emitted when this button was pressed.
-  ///\param   [in] sender: The sending control.
+  ///\brief This signal is emitted when this button was pressed.
   //////////////////////////////////////////////////////////////////////////////
-  void clicked(QImageButton* sender);
+  void clicked();
 
 protected:
 
   //////////////////////////////////////////////////////////////////////////////
-  // QImageButton::paintEvent()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the paint signal.
-  ///\param   [in] event: Provides further details about the event.
-  //////////////////////////////////////////////////////////////////////////////
-  void paintEvent(QPaintEvent* event)
-  {
-    // Do we have a movie?
-    if (image.isNull())
-    {
-      // Let the base class do the painting:
-      QWidget::paintEvent(event);
-      return;
-    }
-
-    // Draw the movie:
-    QPainter qp(this);
-    drawWidget(qp);
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageButton::changeEvent()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for general state change signals.
-  ///\param   [in] event: Provides further details about the event.
-  //////////////////////////////////////////////////////////////////////////////
-  void changeEvent(QEvent* event)
-  {
-    // Base handling:
-    QWidget::changeEvent(event);
-
-    // Redraw if the enabled state changed:
-    if (event->type() == QEvent::EnabledChange)
-      update();
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
   // QImageButton::mousePressEvent()
   //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the mouse button pressed signal.
-  ///\param   [in] event: Provides further details about the event.
+  ///\brief Handler for the mouse button pressed signal.
+  ///\param [in] event: Provides further details about the event.
   //////////////////////////////////////////////////////////////////////////////
   void mousePressEvent(QMouseEvent* event)
   {
@@ -210,7 +90,7 @@ protected:
     if (event->buttons() == Qt::LeftButton)
     {
       // Update display:
-      down = true;
+      m_down = true;
       update();
     }
   }
@@ -218,8 +98,8 @@ protected:
   //////////////////////////////////////////////////////////////////////////////
   // QImageButton::mouseReleaseEvent()
   //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the mouse button released signal.
-  ///\param   [in] event: Provides further details about the event.
+  ///\brief Handler for the mouse button released signal.
+  ///\param [in] event: Provides further details about the event.
   //////////////////////////////////////////////////////////////////////////////
   void mouseReleaseEvent(QMouseEvent* event)
   {
@@ -231,7 +111,7 @@ protected:
     if (!(event->buttons() & Qt::LeftButton))
     {
       // Force redraw:
-      down = false;
+      m_down = false;
       update();
 
       // Check bounds:
@@ -242,15 +122,15 @@ protected:
 
       // Notify listeners:
       if (!signalsBlocked())
-        emit clicked(this);
+        emit clicked();
     }
   }
 
   //////////////////////////////////////////////////////////////////////////////
   // QImageButton::mouseMoveEvent()
   //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the mouse moved signal.
-  ///\param   [in] event: Provides further details about the event.
+  ///\brief Handler for the mouse moved signal.
+  ///\param [in] event: Provides further details about the event.
   //////////////////////////////////////////////////////////////////////////////
   void mouseMoveEvent(QMouseEvent* event)
   {
@@ -267,49 +147,47 @@ protected:
         inside = false;
 
       // State changed?
-      if (inside != down)
+      if (inside != m_down)
       {
         // Repaint:
-        down = inside;
+        m_down = inside;
         update();
       }
     }
   }
-private:
 
   //////////////////////////////////////////////////////////////////////////////
   // QImageButton::drawWidget()
   //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Internal helperthat paints the actual widget.
-  ///\param   [in] qp: Device context to use.
+  ///\brief Internal helper that paints the actual widget.
+  ///\param [in] qp: Device context to use.
   //////////////////////////////////////////////////////////////////////////////
   void drawWidget(QPainter& qp)
   {
-    if (isEnabled() || disabledImage.isNull())
+    if (isEnabled() || disabledImage().isNull())
     {
       // Get size of a single sub image:
-      int w = image.width() / 2;
-      int h = image.height();
+      int w = image().width() / 2;
+      int h = image().height();
 
       // Calc source position:
-      int x = down ? w : 0;
+      int x = m_down ? w : 0;
 
       // Finally blit the image:
-      qp.drawImage(0, 0, image, x, 0, w, h);
+      qp.drawImage(0, 0, image(), x, 0, w, h);
     }
     else
     {
       // Just show the disabled image:
-      qp.drawImage(0, 0, disabledImage);
+      qp.drawImage(0, 0, disabledImage());
     }
   }
 
+private:
+
   //////////////////////////////////////////////////////////////////////////////
   // Member:
-  QImage image;         ///\> The knob movie image strip.
-  QImage disabledImage; ///\> The knob movie image strip.
-  bool down;           ///\> The current value of this toggle.
-  int tag;              ///\> User defined value.
+  bool m_down; ///\> The current state of this button.
 };
 
 #endif // __QIMAGEBUTTON_H_INCLUDED__

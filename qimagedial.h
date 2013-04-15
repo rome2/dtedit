@@ -25,11 +25,11 @@
 #ifndef __QIMAGEDIAL_H_INCLUDED__
 #define __QIMAGEDIAL_H_INCLUDED__
 
-#include <QtGui>
+#include "qimagewidget.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 ///\class QImageDial qimagedial.h
-///\brief An image based QDial alternative.
+///\brief An image based dial control.
 /// This widget serves basically the same purpose as the QDial control but it is
 /// based on an image strip instead of custom drawing. Additionally it works in
 /// linear mode as well and it supports relative movements. A default value can
@@ -38,16 +38,16 @@
 /// Simple usage example:
 ///
 /// QImageDial* dial = new QImageDial(this);
-/// dial->getImage().load(":/images/knob.png");
-/// dial->getDisabledImage().load(":/images/knob_disabled.png");
+/// dial->image().load(":/images/knob.png");
+/// dial->disabledImage().load(":/images/knob_disabled.png");
 /// dial->setFrameCount(31);
 /// dial->setGeometry(10, 10, 40, 40);
 /// dial->setEnabled(true);
-/// connect(dial, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(dialValueChanged(QImageDial*, double)));
+/// connect(dial, SIGNAL(valueChanged()), this, SLOT(dialValueChanged()));
 ///
 ////////////////////////////////////////////////////////////////////////////////
 class QImageDial :
-  public QWidget
+  public QImageWidget
 {
   Q_OBJECT// Qt magic...
 
@@ -61,16 +61,15 @@ public:
   ///\remarks Just initializes the members.
   //////////////////////////////////////////////////////////////////////////////
   QImageDial(QWidget* parent = 0) :
-    QWidget(parent),
-    value(0.5),
-    defaultValue(0.5),
-    frameCount(0),
-    absoluteMode(false),
-    circularMode(false),
-    startY(0),
-    startVal(0.5),
-    linearSize(128),
-    tag(0)
+    QImageWidget(parent),
+    m_value(0.5),
+    m_defaultValue(0.5),
+    m_frameCount(0),
+    m_absoluteMode(false),
+    m_circularMode(false),
+    m_startY(0),
+    m_startVal(0.5),
+    m_linearSize(128)
   {
     // Nothing to do here.
   }
@@ -87,16 +86,16 @@ public:
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // QImageDial::getValue()
+  // QImageDial::value()
   //////////////////////////////////////////////////////////////////////////////
   ///\brief   Get accessor for the Value property.
   ///\return  The current value of this dial.
   ///\remarks The value is always in the range [0,1].
   //////////////////////////////////////////////////////////////////////////////
-  double getValue() const
+  double value() const
   {
     // Return current value:
-    return value;
+    return m_value;
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -111,34 +110,34 @@ public:
   void setValue(const double newVal)
   {
     // Set new value:
-    value = newVal;
+    m_value = newVal;
 
     // Clip value in the range [0,1]:
-    if (value < 0.0)
-      value = 0.0;
-    else if (value > 1.0)
-      value = 1.0;
+    if (m_value < 0.0)
+      m_value = 0.0;
+    else if (m_value > 1.0)
+      m_value = 1.0;
 
     // Schedule redraw:
     update();
 
     // Notify listeners:
     if (!signalsBlocked())
-      emit valueChanged(this, value);
+      emit valueChanged();
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // QImageDial::getDefaultValue()
+  // QImageDial::defaultValue()
   //////////////////////////////////////////////////////////////////////////////
   ///\brief   Get accessor for the DefaultValue property.
   ///\return  The default value of this dial.
   ///\remarks The value is always in the range [0,1]. To load the default value
   ///\        just double click the widget.
   //////////////////////////////////////////////////////////////////////////////
-  double getDefaultValue() const
+  double defaultValue() const
   {
     // Return current value:
-    return defaultValue;
+    return m_defaultValue;
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -152,83 +151,27 @@ public:
   void setDefaultValue(const double newVal)
   {
     // Set new value:
-    defaultValue = newVal;
+    m_defaultValue = newVal;
 
     // Clip value in the range [0,1]:
-    if (defaultValue < 0.0)
-      defaultValue = 0.0;
-    else if (defaultValue > 1.0)
-      defaultValue = 1.0;
+    if (m_defaultValue < 0.0)
+      m_defaultValue = 0.0;
+    else if (m_defaultValue > 1.0)
+      m_defaultValue = 1.0;
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // QImageDial::getImage()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Get accessor for the Image property.
-  ///\return  The current image.
-  ///\remarks This image is the source for the knob movie. It must contain
-  ///         FrameCount sub pictures ordered from left to right.
-  //////////////////////////////////////////////////////////////////////////////
-  QImage& getImage()
-  {
-    // Return our image:
-    return image;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageDial::getImage()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Get accessor for the Image property, const version.
-  ///\return  The current image.
-  ///\remarks This image is the source for the knob movie. It must contain
-  ///         FrameCount sub pictures ordered from left to right.
-  //////////////////////////////////////////////////////////////////////////////
-  const QImage& getImage() const
-  {
-    // Return our image:
-    return image;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageDial::getDisabledImage()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Get accessor for the DisabledImage property.
-  ///\return  The current disabled state image.
-  ///\remarks This image is shown when the widget is disabled. It should have
-  ///         the same size as one frame of the knob movie.
-  //////////////////////////////////////////////////////////////////////////////
-  QImage& getDisabledImage()
-  {
-    // Return our image:
-    return disabledImage;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageDial::getDisabledImage()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Get accessor for the DisabledImage property, const version.
-  ///\return  The current disabled state image.
-  ///\remarks This image is shown when the widget is disabled. It should have
-  ///         the same size as one frame of the knob movie.
-  //////////////////////////////////////////////////////////////////////////////
-  const QImage& getDisabledImage() const
-  {
-    // Return our image:
-    return disabledImage;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageDial::getFrameCount()
+  // QImageDial::frameCount()
   //////////////////////////////////////////////////////////////////////////////
   ///\brief   Get accessor for the FrameCount property.
   ///\return  The current number of frames for the knob movie.
   ///\remarks This property tells this widget how man frames there are in the
   ///         knob movie and thus how to determine the subpicture to show.
   //////////////////////////////////////////////////////////////////////////////
-  int getFrameCount() const
+  int frameCount() const
   {
     // Return current count:
-    return frameCount;
+    return m_frameCount;
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -242,15 +185,15 @@ public:
   void setFrameCount(const int newCount)
   {
     // Set new value:
-    frameCount = newCount;
+    m_frameCount = newCount;
 
     // Clip value:
-    if (frameCount <= 0)
-      frameCount = 1;
+    if (m_frameCount <= 0)
+      m_frameCount = 1;
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // QImageDial::getAbsoluteMode()
+  // QImageDial::absoluteMode()
   //////////////////////////////////////////////////////////////////////////////
   ///\brief   Get accessor for the AbsoluteMode property.
   ///\return  Whether absolute mode is enabled or not.
@@ -258,10 +201,10 @@ public:
   ///         value indicated by the mouse click position. In relative mode it
   ///         will be changed relative to the click position.
   //////////////////////////////////////////////////////////////////////////////
-  bool getAbsoluteMode() const
+  bool absoluteMode() const
   {
     // Return current state:
-    return absoluteMode;
+    return m_absoluteMode;
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -276,11 +219,11 @@ public:
   void setAbsoluteMode(const bool newState)
   {
     // Set new state:
-    absoluteMode = newState;
+    m_absoluteMode = newState;
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // QImageDial::getCircularMode()
+  // QImageDial::circularMode()
   //////////////////////////////////////////////////////////////////////////////
   ///\brief   Get accessor for the CircularMode property.
   ///\return  Whether circular motion is enabled or linear.
@@ -289,10 +232,10 @@ public:
   ///         movement. The linear movement range is defined by the LinearSize
   ///         property.
   //////////////////////////////////////////////////////////////////////////////
-  bool getCircularMode() const
+  bool circularMode() const
   {
     // Return current state:
-    return circularMode;
+    return m_circularMode;
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -308,11 +251,11 @@ public:
   void setCircularMode(const bool newState)
   {
     // Set new state:
-    circularMode = newState;
+    m_circularMode = newState;
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // QImageDial::getLinearSize()
+  // QImageDial::linearSize()
   //////////////////////////////////////////////////////////////////////////////
   ///\brief   Get accessor for the LinearSize property.
   ///\return  The current extends of the linear move mode.
@@ -320,10 +263,10 @@ public:
   ///         in different words, the number of pixels that the value range of
   ///         [0,1] will be mapped to.
   //////////////////////////////////////////////////////////////////////////////
-  int getLinearSize() const
+  int linearSize() const
   {
     // Return current size:
-    return linearSize;
+    return m_linearSize;
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -338,37 +281,11 @@ public:
   void setLinearSize(const int newSize)
   {
     // Set new size:
-    linearSize = newSize;
+    m_linearSize = newSize;
 
     // Clip size:
-    if (linearSize <= 0)
-      linearSize = 1;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageDial::getTag()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Get accessor for the Tag property.
-  ///\return  The currently stored user value.
-  ///\remarks This tag is an arbitrary user defined value.
-  //////////////////////////////////////////////////////////////////////////////
-  int getTag() const
-  {
-    // Return current tag:
-    return tag;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageDial::setTag()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Set accessor for the Tag property.
-  ///\param   [in] newTag: The new user defined value.
-  ///\remarks This tag is an arbitrary user defined value.
-  //////////////////////////////////////////////////////////////////////////////
-  void setTag(const int newTag)
-  {
-    // Set new tag:
-    tag = newTag;
+    if (m_linearSize <= 0)
+      m_linearSize = 1;
   }
 
 signals:
@@ -376,64 +293,24 @@ signals:
   //////////////////////////////////////////////////////////////////////////////
   // QImageDial::valueChanged()
   //////////////////////////////////////////////////////////////////////////////
-  ///\brief   This signal is emitted when the value of this dial changes.
-  ///\param   [in] sender: The sending control.
-  ///\param   [in] newVal: The new value.
+  ///\brief This signal is emitted when the value of this dial changes.
   //////////////////////////////////////////////////////////////////////////////
-  void valueChanged(QImageDial* sender, double newVal);
+  void valueChanged();
 
   //////////////////////////////////////////////////////////////////////////////
   // QImageDial::mouseReleased()
   //////////////////////////////////////////////////////////////////////////////
-  ///\brief   This signal is emitted when the mouse was released.
-  ///\param   [in] sender: The sending control.
+  ///\brief This signal is emitted when the mouse was released.
   //////////////////////////////////////////////////////////////////////////////
-  void mouseReleased(QImageDial* sender);
+  void mouseReleased();
 
 protected:
 
   //////////////////////////////////////////////////////////////////////////////
-  // QImageDial::paintEvent()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the paint signal.
-  ///\param   [in] event: Provides further details about the event.
-  //////////////////////////////////////////////////////////////////////////////
-  void paintEvent(QPaintEvent* event)
-  {
-    // Do we have a movie?
-    if (image.isNull())
-    {
-      // Let the base class do the painting:
-      QWidget::paintEvent(event);
-      return;
-    }
-
-    // Draw the movie:
-    QPainter qp(this);
-    drawWidget(qp);
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageDial::changeEvent()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for general state change signals.
-  ///\param   [in] event: Provides further details about the event.
-  //////////////////////////////////////////////////////////////////////////////
-  void changeEvent(QEvent* event)
-  {
-    // Base handling:
-    QWidget::changeEvent(event);
-
-    // Redraw if the enabled state changed:
-    if (event->type() == QEvent::EnabledChange)
-      update();
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
   // QImageDial::wheelEvent()
   //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the mouse wheel signal.
-  ///\param   [in] event: Provides further details about the event.
+  ///\brief Handler for the mouse wheel signal.
+  ///\param [in] event: Provides further details about the event.
   //////////////////////////////////////////////////////////////////////////////
   void wheelEvent(QWheelEvent* event)
   {
@@ -441,14 +318,14 @@ protected:
     double delta = event->delta() * 0.00025;
 
     // Update value:
-    setValue(value + delta);
+    setValue(m_value + delta);
   }
 
   //////////////////////////////////////////////////////////////////////////////
   // QImageDial::mousePressEvent()
   //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the mouse button pressed signal.
-  ///\param   [in] event: Provides further details about the event.
+  ///\brief Handler for the mouse button pressed signal.
+  ///\param [in] event: Provides further details about the event.
   //////////////////////////////////////////////////////////////////////////////
   void mousePressEvent(QMouseEvent* event)
   {
@@ -460,22 +337,22 @@ protected:
     if (event->buttons() == Qt::LeftButton)
     {
       // Use circular mode?
-      if (circularMode)
+      if (m_circularMode)
       {
         // Get value from the mouse position point:
-        startVal = valueFromMousePos(event->x(), event->y());
+        m_startVal = valueFromMousePos(event->x(), event->y());
 
         // Make value current if needed:
-        if (absoluteMode)
-          setValue(startVal);
+        if (m_absoluteMode)
+          setValue(m_startVal);
       }
 
       // No, linear is the way to go:
       else
       {
         // Save start values:
-        startVal = value;
-        startY   = event->y();
+        m_startVal = m_value;
+        m_startY   = event->y();
       }
     }
   }
@@ -483,8 +360,8 @@ protected:
   //////////////////////////////////////////////////////////////////////////////
   // QImageButton::mouseReleaseEvent()
   //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the mouse button released signal.
-  ///\param   [in] event: Provides further details about the event.
+  ///\brief Handler for the mouse button released signal.
+  ///\param [in] event: Provides further details about the event.
   //////////////////////////////////////////////////////////////////////////////
   void mouseReleaseEvent(QMouseEvent* /* event */)
   {
@@ -494,14 +371,14 @@ protected:
 
     // Notify listeners:
     if (!signalsBlocked())
-      emit mouseReleased(this);
+      emit mouseReleased();
   }
 
   //////////////////////////////////////////////////////////////////////////////
   // QImageDial::mouseDoubleClickEvent()
   //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the mouse double click signal.
-  ///\param   [in] event: Provides further details about the event.
+  ///\brief Handler for the mouse double click signal.
+  ///\param [in] event: Provides further details about the event.
   //////////////////////////////////////////////////////////////////////////////
   void mouseDoubleClickEvent(QMouseEvent* event)
   {
@@ -513,15 +390,15 @@ protected:
     if (event->buttons() == Qt::LeftButton)
     {
       // Load default:
-      setValue(defaultValue);
+      setValue(m_defaultValue);
     }
   }
 
   //////////////////////////////////////////////////////////////////////////////
   // QImageDial::mouseMoveEvent()
   //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the mouse moved signal.
-  ///\param   [in] event: Provides further details about the event.
+  ///\brief Handler for the mouse moved signal.
+  ///\param [in] event: Provides further details about the event.
   //////////////////////////////////////////////////////////////////////////////
   void mouseMoveEvent(QMouseEvent* event)
   {
@@ -533,21 +410,21 @@ protected:
     if (event->buttons() == Qt::LeftButton)
     {
       // Running in circles?
-      if (circularMode)
+      if (m_circularMode)
       {
         // Get value from the mouse position point:
         double val = valueFromMousePos(event->x(), event->y());
 
         // Set value:
-        if (absoluteMode)
+        if (m_absoluteMode)
           setValue(val);
         else
         {
           // Set new value relative to the last value:
-          setValue(value + (val - startVal));
+          setValue(m_value + (val - m_startVal));
 
           // Save current value for the next round:
-          startVal = val;
+          m_startVal = val;
         }
       }
 
@@ -555,14 +432,50 @@ protected:
       else
       {
         // Calc movement in pixels:
-        double dy = startY - event->y();
+        double dy = m_startY - event->y();
 
         // Scale into a more usable range:
-        double diff = dy / linearSize;
+        double diff = dy / m_linearSize;
 
         // Set new value relative to the start value:
-        setValue(startVal + diff);
+        setValue(m_startVal + diff);
       }
+    }
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // QImageDial::drawWidget()
+  //////////////////////////////////////////////////////////////////////////////
+  ///\brief Internal helper that paints the actual widget.
+  ///\param [in] qp: Device context to use.
+  //////////////////////////////////////////////////////////////////////////////
+  void drawWidget(QPainter& qp)
+  {
+    if (isEnabled() || disabledImage().isNull())
+    {
+      // Get size of a single sub image:
+      int w = image().width() / m_frameCount;
+      int h = image().height();
+
+      // Calc active frame:
+      int l = (int)(m_value * (m_frameCount - 1));
+      if (l < 0)
+        l = 0;
+      if (l > (m_frameCount - 1))
+        l = m_frameCount - 1;
+
+      // Calc source position:
+      int x = w * l;
+      int y = 0;
+
+      // Finally blit the image:
+      qp.drawImage(0, 0, image(), x, y, w, h);
+    }
+
+    else
+    {
+      // Just show the disabled image:
+      qp.drawImage(0, 0, disabledImage());
     }
   }
 
@@ -571,10 +484,10 @@ private:
   //////////////////////////////////////////////////////////////////////////////
   // QImageDial::valueFromMousePos()
   //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Internal helper to calc a dial value for mouse coordinates.
-  ///\param   [in] mx: Input position, X component.
-  ///\param   [in] my: Input position, Y component.
-  ///\return  The matching value for the input coordinates.
+  ///\brief  Internal helper to calc a dial value for mouse coordinates.
+  ///\param  [in] mx: Input position, X component.
+  ///\param  [in] my: Input position, Y component.
+  ///\return The matching value for the input coordinates.
   //////////////////////////////////////////////////////////////////////////////
   double valueFromMousePos(const int mx, const int my) const
   {
@@ -601,58 +514,19 @@ private:
     }
 
     // We hit the center, return current value:
-    return value;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageDial::drawWidget()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Internal helperthat paints the actual widget.
-  ///\param   [in] qp: Device context to use.
-  //////////////////////////////////////////////////////////////////////////////
-  void drawWidget(QPainter& qp)
-  {
-    if (isEnabled() || disabledImage.isNull())
-    {
-      // Get size of a single sub image:
-      int w = image.width() / frameCount;
-      int h = image.height();
-
-      // Calc active frame:
-      int l = (int)(value * (frameCount - 1));
-      if (l < 0)
-        l = 0;
-      if (l > (frameCount - 1))
-        l = frameCount - 1;
-
-      // Calc source position:
-      int x = w * l;
-      int y = 0;
-
-      // Finally blit the image:
-      qp.drawImage(0, 0, image, x, y, w, h);
-    }
-
-    else
-    {
-      // Just show the disabled image:
-      qp.drawImage(0, 0, disabledImage);
-    }
+    return m_value;
   }
 
   //////////////////////////////////////////////////////////////////////////////
   // Member:
-  double value;         ///\> The current value of this dial.
-  double defaultValue;  ///\> The default value of this value.
-  int frameCount;       ///\> The number of frames in the knob movie image.
-  bool absoluteMode;    ///\> Use absolute or relative movement?
-  bool circularMode;    ///\> Use linear or circular movement?
-  int startY;           ///\> Mouse down position for linear movement.
-  double startVal;      ///\> Value when the movement starts.
-  QImage image;         ///\> The knob movie image strip.
-  QImage disabledImage; ///\> The knob movie image strip.
-  int linearSize;       ///\> Scaling for linear movement.
-  int tag;              ///\> User defined value.
+  double m_value;        ///\> The current value of this dial.
+  double m_defaultValue; ///\> The default value of this value.
+  int m_frameCount;      ///\> The number of frames in the knob movie image.
+  bool m_absoluteMode;   ///\> Use absolute or relative movement?
+  bool m_circularMode;   ///\> Use linear or circular movement?
+  int m_startY;          ///\> Mouse down position for linear movement.
+  double m_startVal;     ///\> Value when the movement starts.
+  int m_linearSize;      ///\> Scaling for linear movement.
 };
 
 #endif // __QIMAGEDIAL_H_INCLUDED__

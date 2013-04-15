@@ -24,7 +24,11 @@
 /// or write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth
 /// Floor, Boston, MA 02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
-#include <QtGui/QApplication>
+#if QT_VERSION >= 0x050000
+#include <QtGui/QGuiApplication>
+#else
+#include <QApplication>
+#endif
 #include "dtedit.h"
 #include "mainmidiwindow.h"
 #include "mainwindow.h"

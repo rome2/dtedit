@@ -28,6 +28,9 @@
 #define __MAINMIDIWINDOW_H_INCLUDED__
 
 #include <QtGui>
+#if QT_VERSION >= 0x050000
+#include <QtWidgets>
+#endif
 #include "RtMidi/RtMidi.h"
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -25,14 +25,14 @@
 #ifndef __QIMAGETOGGLE_H_INCLUDED__
 #define __QIMAGETOGGLE_H_INCLUDED__
 
-#include <QtGui>
+#include "qimagewidget.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 ///\class QImageToggle qimagetoggle.h
 ///\brief -
 ////////////////////////////////////////////////////////////////////////////////
 class QImageToggle :
-  public QWidget
+  public QImageWidget
 {
   Q_OBJECT// Qt magic...
 
@@ -46,9 +46,9 @@ public:
   ///\remarks Just initializes the members.
   //////////////////////////////////////////////////////////////////////////////
   QImageToggle(QWidget* parent = 0) :
-    QWidget(parent),
-    value(false),
-    leftRight(false)
+    QImageWidget(parent),
+    m_value(false),
+    m_leftRight(false)
   {
     // Nothing to do here.
   }
@@ -65,16 +65,16 @@ public:
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // QImageToggle::getValue()
+  // QImageToggle::value()
   //////////////////////////////////////////////////////////////////////////////
   ///\brief   Get accessor for the Value property.
   ///\return  The current value of this dial.
   ///\remarks The value is either true or false.
   //////////////////////////////////////////////////////////////////////////////
-  bool getValue() const
+  bool value() const
   {
     // Return current value:
-    return value;
+    return m_value;
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -88,88 +88,32 @@ public:
   void setValue(const bool newVal)
   {
     // Anything to do?
-    if (value == newVal)
+    if (m_value == newVal)
       return;
 
     // Set new value:
-    value = newVal;
+    m_value = newVal;
 
     // Force redraw:
     update();
 
     // Notify listeners:
     if (!signalsBlocked())
-      emit valueChanged(this, value);
+      emit valueChanged();
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // QImageToggle::getImage()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Get accessor for the Image property.
-  ///\return  The current image.
-  ///\remarks This image is the source for the toggle. It must contain two sub
-  ///         pictures ordered from left to right.
-  //////////////////////////////////////////////////////////////////////////////
-  QImage& getImage()
-  {
-    // Return our image:
-    return image;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageToggle::getImage()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Get accessor for the Image property, const version.
-  ///\return  The current image.
-  ///\remarks This image is the source for the toggle. It must contain two sub
-  ///         pictures ordered from left to right.
-  //////////////////////////////////////////////////////////////////////////////
-  const QImage& getImage() const
-  {
-    // Return our image:
-    return image;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageToggle::getDisabledImage()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Get accessor for the DisabledImage property.
-  ///\return  The current disabled state image.
-  ///\remarks This image is shown when the widget is disabled. It should have
-  ///         the same size as one frame of the toggle image.
-  //////////////////////////////////////////////////////////////////////////////
-  QImage& getDisabledImage()
-  {
-    // Return our image:
-    return disabledImage;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageToggle::getDisabledImage()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Get accessor for the DisabledImage property, const version.
-  ///\return  The current disabled state image.
-  ///\remarks This image is shown when the widget is disabled. It should have
-  ///         the same size as one frame of the toggle image.
-  //////////////////////////////////////////////////////////////////////////////
-  const QImage& getDisabledImage() const
-  {
-    // Return our image:
-    return disabledImage;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageToggle::getLeftRight()
+  // QImageToggle::leftRight()
   //////////////////////////////////////////////////////////////////////////////
   ///\brief   Get accessor for the LeftRight property.
   ///\return  The current left to right mode.
   ///\remarks If this is true then we are working left to right instead of top
   ///         to bottom.
   //////////////////////////////////////////////////////////////////////////////
-  bool getLeftRight() const
+  bool leftRight() const
   {
     // Return current state:
-    return leftRight;
+    return m_leftRight;
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -183,33 +127,7 @@ public:
   void setLeftRight(const int newState)
   {
     // Set new state:
-    leftRight = newState;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageToggle::getTag()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Get accessor for the Tag property.
-  ///\return  The currently stored user value.
-  ///\remarks This tag is an arbitrary user defined value.
-  //////////////////////////////////////////////////////////////////////////////
-  int getTag() const
-  {
-    // Return current tag:
-    return tag;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageToggle::setTag()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Set accessor for the Tag property.
-  ///\param   [in] newTag: The new user defined value.
-  ///\remarks This tag is an arbitrary user defined value.
-  //////////////////////////////////////////////////////////////////////////////
-  void setTag(const int newTag)
-  {
-    // Set new tag:
-    tag = newTag;
+    m_leftRight = newState;
   }
 
 signals:
@@ -217,50 +135,11 @@ signals:
   //////////////////////////////////////////////////////////////////////////////
   // QImageToggle::valueChanged()
   //////////////////////////////////////////////////////////////////////////////
-  ///\brief   This signal is emitted when the value of this dial changes.
-  ///\param   [in] sender: The sending control.
-  ///\param   [in] newVal: The new value.
+  ///\brief   This signal is emitted when the value of this button changes.
   //////////////////////////////////////////////////////////////////////////////
-  void valueChanged(QImageToggle* sender, bool newVal);
+  void valueChanged();
 
 protected:
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageToggle::paintEvent()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the paint signal.
-  ///\param   [in] event: Provides further details about the event.
-  //////////////////////////////////////////////////////////////////////////////
-  void paintEvent(QPaintEvent* event)
-  {
-    // Do we have a movie?
-    if (image.isNull())
-    {
-      // Let the base class do the painting:
-      QWidget::paintEvent(event);
-      return;
-    }
-
-    // Draw the movie:
-    QPainter qp(this);
-    drawWidget(qp);
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageToggle::changeEvent()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for general state change signals.
-  ///\param   [in] event: Provides further details about the event.
-  //////////////////////////////////////////////////////////////////////////////
-  void changeEvent(QEvent* event)
-  {
-    // Base handling:
-    QWidget::changeEvent(event);
-
-    // Redraw if the enabled state changed:
-    if (event->type() == QEvent::EnabledChange)
-      update();
-  }
 
   //////////////////////////////////////////////////////////////////////////////
   // QImageToggle::mousePressEvent()
@@ -278,8 +157,8 @@ protected:
     if (event->buttons() == Qt::LeftButton)
     {
       // Save start position:
-      startPos.setX(event->x());
-      startPos.setY(event->y());
+      m_startPos.setX(event->x());
+      m_startPos.setY(event->y());
     }
   }
 
@@ -308,11 +187,38 @@ protected:
       bool newVal = valueFromMousePos(event->x(), event->y());
 
       // Compare to start position:
-      if (newVal != valueFromMousePos(startPos.x(), startPos.y()))
+      if (newVal != valueFromMousePos(m_startPos.x(), m_startPos.y()))
         return;
 
       // Update widget:
       setValue(newVal);
+    }
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // QImageToggle::drawWidget()
+  //////////////////////////////////////////////////////////////////////////////
+  ///\brief Internal helper that paints the actual widget.
+  ///\param [in] qp: Device context to use.
+  //////////////////////////////////////////////////////////////////////////////
+  void drawWidget(QPainter& qp)
+  {
+    if (isEnabled() || disabledImage().isNull())
+    {
+      // Get size of a single sub image:
+      int w = image().width() / 2;
+      int h = image().height();
+
+      // Calc source position:
+      int x = m_value ? w : 0;
+
+      // Finally blit the image:
+      qp.drawImage(0, 0, image(), x, 0, w, h);
+    }
+    else
+    {
+      // Just show the disabled image:
+      qp.drawImage(0, 0, disabledImage());
     }
   }
 
@@ -321,10 +227,10 @@ private:
   //////////////////////////////////////////////////////////////////////////////
   // QImageToggle::valueFromMousePos()
   //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Internal helper to calc a value for mouse coordinates.
-  ///\param   [in] mx: Input position, X component.
-  ///\param   [in] my: Input position, Y component.
-  ///\return  The matching value for the input coordinates.
+  ///\brief  Internal helper to calc a value for mouse coordinates.
+  ///\param  [in] mx: Input position, X component.
+  ///\param  [in] my: Input position, Y component.
+  ///\return The matching value for the input coordinates.
   //////////////////////////////////////////////////////////////////////////////
   bool valueFromMousePos(const int mx, const int my) const
   {
@@ -333,46 +239,16 @@ private:
     int by = height() / 2;
 
     // Find matching half:
-    if (leftRight)
+    if (m_leftRight)
       return mx < bx;
     return my < by;
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // QImageToggle::drawWidget()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Internal helperthat paints the actual widget.
-  ///\param   [in] qp: Device context to use.
-  //////////////////////////////////////////////////////////////////////////////
-  void drawWidget(QPainter& qp)
-  {
-    if (isEnabled() || disabledImage.isNull())
-    {
-      // Get size of a single sub image:
-      int w = image.width() / 2;
-      int h = image.height();
-
-      // Calc source position:
-      int x = value ? w : 0;
-
-      // Finally blit the image:
-      qp.drawImage(0, 0, image, x, 0, w, h);
-    }
-    else
-    {
-      // Just show the disabled image:
-      qp.drawImage(0, 0, disabledImage);
-    }
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
   // Member:
-  QPoint startPos;      ///\> Mouse down position.
-  QImage image;         ///\> The knob movie image strip.
-  QImage disabledImage; ///\> The knob movie image strip.
-  bool value;           ///\> The current value of this toggle.
-  bool leftRight;       ///\> Work left to right?
-  int tag;              ///\> User defined value.
+  QPoint m_startPos; ///\> Mouse down position.
+  bool m_value;      ///\> The current value of this toggle.
+  bool m_leftRight;  ///\> Work left to right?
 };
 
 #endif // __QIMAGETOGGLE_H_INCLUDED__

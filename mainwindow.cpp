@@ -28,7 +28,6 @@
 #include "mainmidiwindow.h"
 #include "mainwindow.h"
 #include "aboutdialog.h"
-#include <Qt/qdom.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 // MainWindow::MainWindow()
@@ -261,7 +260,7 @@ void MainWindow::controlChangeReceived(unsigned char channel, unsigned char cont
     volumeA->blockSignals(oldState);
     break;
   case CC_VOICE_A:
-    if (voiceA->getValue() != value)
+    if (voiceA->value() != value)
     {
       oldState = voiceA->blockSignals(true);
       voiceA->setValue(value);
@@ -275,7 +274,7 @@ void MainWindow::controlChangeReceived(unsigned char channel, unsigned char cont
     reverbBypassA->setValue(value >= 64);
     reverbBypassA->blockSignals(oldState);
     oldState = reverbLedA->blockSignals(true);
-    reverbLedA->setValue(reverbBypassA->getValue());
+    reverbLedA->setValue(reverbBypassA->value());
     reverbLedA->blockSignals(oldState);
     break;
   case CC_REV_TYPE_A:
@@ -374,7 +373,7 @@ void MainWindow::controlChangeReceived(unsigned char channel, unsigned char cont
     volumeB->blockSignals(oldState);
     break;
   case CC_VOICE_B:
-    if (voiceB->getValue() != value)
+    if (voiceB->value() != value)
     {
       oldState = voiceB->blockSignals(true);
       voiceB->setValue(value);
@@ -388,7 +387,7 @@ void MainWindow::controlChangeReceived(unsigned char channel, unsigned char cont
     reverbBypassB->setValue(value >= 64);
     reverbBypassB->blockSignals(oldState);
     oldState = reverbLedB->blockSignals(true);
-    reverbLedB->setValue(reverbBypassB->getValue());
+    reverbLedB->setValue(reverbBypassB->value());
     reverbLedB->blockSignals(oldState);
     break;
   case CC_REV_TYPE_B:
@@ -456,7 +455,7 @@ void MainWindow::controlChangeReceived(unsigned char channel, unsigned char cont
     lowVol->setValue(value < 64);
     lowVol->blockSignals(oldState);
     oldState = lowVolLed->blockSignals(true);
-    lowVolLed->setValue(!lowVol->getValue());
+    lowVolLed->setValue(!lowVol->value());
     lowVolLed->blockSignals(oldState);
     break;
   case CC_CHANNEL:
@@ -548,11 +547,11 @@ void MainWindow::createEditArea()
 
   voiceA = new QImageToggle4(this);
   voiceA->setGeometry(x0 + 34, y0 + 30, 48, 48);
-  voiceA->getImage().load(":/images/I_II_III_IV.png");
-  voiceA->getDisabledImage().load(":/images/I_II_III_IV_disabled.png");
+  voiceA->image().load(":/images/I_II_III_IV.png");
+  voiceA->disabledImage().load(":/images/I_II_III_IV_disabled.png");
   voiceA->setEnabled(true);
   voiceA->setTag(CC_VOICE_A);
-  connect(voiceA, SIGNAL(valueChanged(QImageToggle4*, int)), this, SLOT(toggle4Changed(QImageToggle4*, int)));
+  connect(voiceA, SIGNAL(valueChanged()), this, SLOT(toggle4Changed()));
 
   ampA = new QComboBox(this);
   ampA->addItem("None");
@@ -614,64 +613,64 @@ void MainWindow::createEditArea()
   connect(cabA, SIGNAL(currentIndexChanged(int)), this, SLOT(cabAChanged(int)));
 
   gainA = new QImageDial(this);
-  gainA->getImage().load(":/images/knob_movie.png");
-  gainA->getDisabledImage().load(":/images/knob_disabled.png");
+  gainA->image().load(":/images/knob_movie.png");
+  gainA->disabledImage().load(":/images/knob_disabled.png");
   gainA->setFrameCount(61);
   gainA->setEnabled(true);
   gainA->setGeometry(x0 + 303, y0 + 30, 48, 48);
   gainA->setTag(CC_GAIN_A);
-  connect(gainA, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
-  connect(gainA, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
+  connect(gainA, SIGNAL(valueChanged()), this, SLOT(rotaryChanged()));
+  connect(gainA, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   bassA = new QImageDial(this);
-  bassA->getImage().load(":/images/knob_movie.png");
-  bassA->getDisabledImage().load(":/images/knob_disabled.png");
+  bassA->image().load(":/images/knob_movie.png");
+  bassA->disabledImage().load(":/images/knob_disabled.png");
   bassA->setFrameCount(61);
   bassA->setEnabled(true);
   bassA->setGeometry(x0 + 367, y0 + 30, 48, 48);
   bassA->setTag(CC_BASS_A);
-  connect(bassA, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
-  connect(bassA, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
+  connect(bassA, SIGNAL(valueChanged()), this, SLOT(rotaryChanged()));
+  connect(bassA, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   middleA = new QImageDial(this);
-  middleA->getImage().load(":/images/knob_movie.png");
-  middleA->getDisabledImage().load(":/images/knob_disabled.png");
+  middleA->image().load(":/images/knob_movie.png");
+  middleA->disabledImage().load(":/images/knob_disabled.png");
   middleA->setFrameCount(61);
   middleA->setEnabled(true);
   middleA->setGeometry(x0 + 431, y0 + 30, 48, 48);
   middleA->setTag(CC_MIDDLE_A);
-  connect(middleA, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
-  connect(middleA, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
+  connect(middleA, SIGNAL(valueChanged()), this, SLOT(rotaryChanged()));
+  connect(middleA, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   trebleA = new QImageDial(this);
-  trebleA->getImage().load(":/images/knob_movie.png");
-  trebleA->getDisabledImage().load(":/images/knob_disabled.png");
+  trebleA->image().load(":/images/knob_movie.png");
+  trebleA->disabledImage().load(":/images/knob_disabled.png");
   trebleA->setFrameCount(61);
   trebleA->setEnabled(true);
   trebleA->setGeometry(x0 + 495, y0 + 30, 48, 48);
   trebleA->setTag(CC_TREBLE_A);
-  connect(trebleA, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
-  connect(trebleA, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
+  connect(trebleA, SIGNAL(valueChanged()), this, SLOT(rotaryChanged()));
+  connect(trebleA, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   presenceA = new QImageDial(this);
-  presenceA->getImage().load(":/images/knob_movie.png");
-  presenceA->getDisabledImage().load(":/images/knob_disabled.png");
+  presenceA->image().load(":/images/knob_movie.png");
+  presenceA->disabledImage().load(":/images/knob_disabled.png");
   presenceA->setFrameCount(61);
   presenceA->setEnabled(true);
   presenceA->setGeometry(x0 + 559, y0 + 30, 48, 48);
   presenceA->setTag(CC_PRESENCE_A);
-  connect(presenceA, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
-  connect(presenceA, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
+  connect(presenceA, SIGNAL(valueChanged()), this, SLOT(rotaryChanged()));
+  connect(presenceA, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   volumeA = new QImageDial(this);
-  volumeA->getImage().load(":/images/knob_movie.png");
-  volumeA->getDisabledImage().load(":/images/knob_disabled.png");
+  volumeA->image().load(":/images/knob_movie.png");
+  volumeA->disabledImage().load(":/images/knob_disabled.png");
   volumeA->setFrameCount(61);
   volumeA->setEnabled(true);
   volumeA->setGeometry(x0 + 623, y0 + 30, 48, 48);
   volumeA->setTag(CC_VOLUME_A);
-  connect(volumeA, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
-  connect(volumeA, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
+  connect(volumeA, SIGNAL(valueChanged()), this, SLOT(rotaryChanged()));
+  connect(volumeA, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   reverbA = new QComboBox(this);
   reverbA->addItem("None");
@@ -692,117 +691,117 @@ void MainWindow::createEditArea()
   connect(reverbA, SIGNAL(currentIndexChanged(int)), this, SLOT(reverbAChanged(int)));
 
   reverbLedA = new QImageLED(this);
-  reverbLedA->getImage().load(":/images/led_yellow.png");
-  reverbLedA->getDisabledImage().load(":/images/led_yellow_disabled.png");
+  reverbLedA->image().load(":/images/led_yellow.png");
+  reverbLedA->disabledImage().load(":/images/led_yellow_disabled.png");
   reverbLedA->setGeometry(x0 + 244, y0 + 130, 31, 31);
   reverbLedA->setEnabled(true);
   reverbLedA->setValue(true);
 
   reverbBypassA = new QImageToggle(this);
   reverbBypassA->setGeometry(x0 + 275, y0 + 130, 44, 31);
-  reverbBypassA->getImage().load(":/images/onoff.png");
-  reverbBypassA->getDisabledImage().load(":/images/onoff_disabled.png");
+  reverbBypassA->image().load(":/images/onoff.png");
+  reverbBypassA->disabledImage().load(":/images/onoff_disabled.png");
   reverbBypassA->setEnabled(true);
   reverbBypassA->setTag(CC_REV_BYPASS_A);
   reverbBypassA->setLeftRight(true);
   reverbBypassA->setValue(true);
-  connect(reverbBypassA, SIGNAL(valueChanged(QImageToggle*, bool)), this, SLOT(toggleChanged(QImageToggle*, bool)));
+  connect(reverbBypassA, SIGNAL(valueChanged()), this, SLOT(toggleChanged()));
 
   reverbDecayA = new QImageDial(this);
-  reverbDecayA->getImage().load(":/images/knob_movie.png");
-  reverbDecayA->getDisabledImage().load(":/images/knob_disabled.png");
+  reverbDecayA->image().load(":/images/knob_movie.png");
+  reverbDecayA->disabledImage().load(":/images/knob_disabled.png");
   reverbDecayA->setFrameCount(61);
   reverbDecayA->setEnabled(true);
   reverbDecayA->setGeometry(x0 + 431, y0 + 133, 48, 48);
   reverbDecayA->setTag(CC_REV_DECAY_A);
-  connect(reverbDecayA, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
-  connect(reverbDecayA, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
+  connect(reverbDecayA, SIGNAL(valueChanged()), this, SLOT(rotaryChanged()));
+  connect(reverbDecayA, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   reverbPredelayA = new QImageDial(this);
-  reverbPredelayA->getImage().load(":/images/knob_movie.png");
-  reverbPredelayA->getDisabledImage().load(":/images/knob_disabled.png");
+  reverbPredelayA->image().load(":/images/knob_movie.png");
+  reverbPredelayA->disabledImage().load(":/images/knob_disabled.png");
   reverbPredelayA->setFrameCount(61);
   reverbPredelayA->setEnabled(true);
   reverbPredelayA->setGeometry(x0 + 495, y0 + 133, 48, 48);
   reverbPredelayA->setTag(CC_REV_PREDELAY_A);
-  connect(reverbPredelayA, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
-  connect(reverbPredelayA, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
+  connect(reverbPredelayA, SIGNAL(valueChanged()), this, SLOT(rotaryChanged()));
+  connect(reverbPredelayA, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   reverbToneA = new QImageDial(this);
-  reverbToneA->getImage().load(":/images/knob_movie.png");
-  reverbToneA->getDisabledImage().load(":/images/knob_disabled.png");
+  reverbToneA->image().load(":/images/knob_movie.png");
+  reverbToneA->disabledImage().load(":/images/knob_disabled.png");
   reverbToneA->setFrameCount(61);
   reverbToneA->setEnabled(true);
   reverbToneA->setGeometry(x0 + 559, y0 + 133, 48, 48);
   reverbToneA->setTag(CC_REV_TONE_A);
-  connect(reverbToneA, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
-  connect(reverbToneA, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
+  connect(reverbToneA, SIGNAL(valueChanged()), this, SLOT(rotaryChanged()));
+  connect(reverbToneA, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   reverbMixA = new QImageDial(this);
-  reverbMixA->getImage().load(":/images/knob_movie.png");
-  reverbMixA->getDisabledImage().load(":/images/knob_disabled.png");
+  reverbMixA->image().load(":/images/knob_movie.png");
+  reverbMixA->disabledImage().load(":/images/knob_disabled.png");
   reverbMixA->setFrameCount(61);
   reverbMixA->setEnabled(true);
   reverbMixA->setGeometry(x0 + 623, y0 + 133, 48, 48);
   reverbMixA->setTag(CC_REV_MIX_A);
-  connect(reverbMixA, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
-  connect(reverbMixA, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
+  connect(reverbMixA, SIGNAL(valueChanged()), this, SLOT(rotaryChanged()));
+  connect(reverbMixA, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   classA = new QImageToggle(this);
   classA->setGeometry(x0 + 720, y0 + 23, 64, 88);
-  classA->getImage().load(":/images/class.png");
-  classA->getDisabledImage().load(":/images/class_disabled.png");
+  classA->image().load(":/images/class.png");
+  classA->disabledImage().load(":/images/class_disabled.png");
   classA->setEnabled(true);
   classA->setTag(CC_CLASS_A);
-  connect(classA, SIGNAL(valueChanged(QImageToggle*, bool)), this, SLOT(toggleChanged(QImageToggle*, bool)));
+  connect(classA, SIGNAL(valueChanged()), this, SLOT(toggleChanged()));
 
   topolA = new QImageToggle4(this);
   topolA->setGeometry(x0 + 804, y0 + 38, 48, 48);
-  topolA->getImage().load(":/images/I_II_III_IV.png");
-  topolA->getDisabledImage().load(":/images/I_II_III_IV_disabled.png");
+  topolA->image().load(":/images/I_II_III_IV.png");
+  topolA->disabledImage().load(":/images/I_II_III_IV_disabled.png");
   topolA->setEnabled(true);
   topolA->setTag(CC_TOPOL_A);
-  connect(topolA, SIGNAL(valueChanged(QImageToggle4*, int)), this, SLOT(toggle4Changed(QImageToggle4*, int)));
+  connect(topolA, SIGNAL(valueChanged()), this, SLOT(toggle4Changed()));
 
   xtodeA = new QImageToggle(this);
   xtodeA->setGeometry(x0 + 871, y0 + 23, 64, 88);
-  xtodeA->getImage().load(":/images/xtode.png");
-  xtodeA->getDisabledImage().load(":/images/xtode_disabled.png");
+  xtodeA->image().load(":/images/xtode.png");
+  xtodeA->disabledImage().load(":/images/xtode_disabled.png");
   xtodeA->setEnabled(true);
   xtodeA->setTag(CC_XTODE_A);
-  connect(xtodeA, SIGNAL(valueChanged(QImageToggle*, bool)), this, SLOT(toggleChanged(QImageToggle*, bool)));
+  connect(xtodeA, SIGNAL(valueChanged()), this, SLOT(toggleChanged()));
 
   boostA = new QImageToggle(this);
   boostA->setGeometry(x0 + 720, y0 + 112, 64, 88);
-  boostA->getImage().load(":/images/boost.png");
-  boostA->getDisabledImage().load(":/images/boost_disabled.png");
+  boostA->image().load(":/images/boost.png");
+  boostA->disabledImage().load(":/images/boost_disabled.png");
   boostA->setEnabled(true);
   boostA->setTag(CC_BOOST_A);
-  connect(boostA, SIGNAL(valueChanged(QImageToggle*, bool)), this, SLOT(toggleChanged(QImageToggle*, bool)));
+  connect(boostA, SIGNAL(valueChanged()), this, SLOT(toggleChanged()));
 
   pivoltA = new QImageToggle(this);
   pivoltA->setGeometry(x0 + 795, y0 + 112, 64, 88);
-  pivoltA->getImage().load(":/images/piv.png");
-  pivoltA->getDisabledImage().load(":/images/piv_disabled.png");
+  pivoltA->image().load(":/images/piv.png");
+  pivoltA->disabledImage().load(":/images/piv_disabled.png");
   pivoltA->setEnabled(true);
   pivoltA->setTag(CC_PI_VOLTAGE_A);
-  connect(pivoltA, SIGNAL(valueChanged(QImageToggle*, bool)), this, SLOT(toggleChanged(QImageToggle*, bool)));
+  connect(pivoltA, SIGNAL(valueChanged()), this, SLOT(toggleChanged()));
 
   capA = new QImageToggle(this);
   capA->setGeometry(x0 + 871, y0 + 112, 64, 88);
-  capA->getImage().load(":/images/cap.png");
-  capA->getDisabledImage().load(":/images/cap_disabled.png");
+  capA->image().load(":/images/cap.png");
+  capA->disabledImage().load(":/images/cap_disabled.png");
   capA->setEnabled(true);
   capA->setTag(CC_CAP_TYPE_A);
-  connect(capA, SIGNAL(valueChanged(QImageToggle*, bool)), this, SLOT(toggleChanged(QImageToggle*, bool)));
+  connect(capA, SIGNAL(valueChanged()), this, SLOT(toggleChanged()));
 
   voiceB = new QImageToggle4(this);
   voiceB->setGeometry(x0 + 34, y0 + 336, 48, 48);
-  voiceB->getImage().load(":/images/I_II_III_IV.png");
-  voiceB->getDisabledImage().load(":/images/I_II_III_IV_disabled.png");
+  voiceB->image().load(":/images/I_II_III_IV.png");
+  voiceB->disabledImage().load(":/images/I_II_III_IV_disabled.png");
   voiceB->setEnabled(true);
   voiceB->setTag(CC_VOICE_B);
-  connect(voiceB, SIGNAL(valueChanged(QImageToggle4*, int)), this, SLOT(toggle4Changed(QImageToggle4*, int)));
+  connect(voiceB, SIGNAL(valueChanged()), this, SLOT(toggle4Changed()));
 
   ampB = new QComboBox(this);
   ampB->addItem("None");
@@ -864,64 +863,64 @@ void MainWindow::createEditArea()
   connect(cabB, SIGNAL(currentIndexChanged(int)), this, SLOT(cabBChanged(int)));
 
   gainB = new QImageDial(this);
-  gainB->getImage().load(":/images/knob_movie.png");
-  gainB->getDisabledImage().load(":/images/knob_disabled.png");
+  gainB->image().load(":/images/knob_movie.png");
+  gainB->disabledImage().load(":/images/knob_disabled.png");
   gainB->setFrameCount(61);
   gainB->setEnabled(true);
   gainB->setGeometry(x0 + 303, y0 + 336, 48, 48);
   gainB->setTag(CC_GAIN_B);
-  connect(gainB, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
-  connect(gainB, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
+  connect(gainB, SIGNAL(valueChanged()), this, SLOT(rotaryChanged()));
+  connect(gainB, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   bassB = new QImageDial(this);
-  bassB->getImage().load(":/images/knob_movie.png");
-  bassB->getDisabledImage().load(":/images/knob_disabled.png");
+  bassB->image().load(":/images/knob_movie.png");
+  bassB->disabledImage().load(":/images/knob_disabled.png");
   bassB->setFrameCount(61);
   bassB->setEnabled(true);
   bassB->setGeometry(x0 + 367, y0 + 336, 48, 48);
   bassB->setTag(CC_BASS_B);
-  connect(bassB, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
-  connect(bassB, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
+  connect(bassB, SIGNAL(valueChanged()), this, SLOT(rotaryChanged()));
+  connect(bassB, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   middleB = new QImageDial(this);
-  middleB->getImage().load(":/images/knob_movie.png");
-  middleB->getDisabledImage().load(":/images/knob_disabled.png");
+  middleB->image().load(":/images/knob_movie.png");
+  middleB->disabledImage().load(":/images/knob_disabled.png");
   middleB->setFrameCount(61);
   middleB->setEnabled(true);
   middleB->setGeometry(x0 + 431, y0 + 336, 48, 48);
   middleB->setTag(CC_MIDDLE_B);
-  connect(middleB, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
-  connect(middleB, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
+  connect(middleB, SIGNAL(valueChanged()), this, SLOT(rotaryChanged()));
+  connect(middleB, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   trebleB = new QImageDial(this);
-  trebleB->getImage().load(":/images/knob_movie.png");
-  trebleB->getDisabledImage().load(":/images/knob_disabled.png");
+  trebleB->image().load(":/images/knob_movie.png");
+  trebleB->disabledImage().load(":/images/knob_disabled.png");
   trebleB->setFrameCount(61);
   trebleB->setEnabled(true);
   trebleB->setGeometry(x0 + 495, y0 + 336, 48, 48);
   trebleB->setTag(CC_TREBLE_B);
-  connect(trebleB, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
-  connect(trebleB, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
+  connect(trebleB, SIGNAL(valueChanged()), this, SLOT(rotaryChanged()));
+  connect(trebleB, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   presenceB = new QImageDial(this);
-  presenceB->getImage().load(":/images/knob_movie.png");
-  presenceB->getDisabledImage().load(":/images/knob_disabled.png");
+  presenceB->image().load(":/images/knob_movie.png");
+  presenceB->disabledImage().load(":/images/knob_disabled.png");
   presenceB->setFrameCount(61);
   presenceB->setEnabled(true);
   presenceB->setGeometry(x0 + 559, y0 + 336, 48, 48);
   presenceB->setTag(CC_PRESENCE_B);
-  connect(presenceB, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
-  connect(presenceB, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
+  connect(presenceB, SIGNAL(valueChanged()), this, SLOT(rotaryChanged()));
+  connect(presenceB, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   volumeB = new QImageDial(this);
-  volumeB->getImage().load(":/images/knob_movie.png");
-  volumeB->getDisabledImage().load(":/images/knob_disabled.png");
+  volumeB->image().load(":/images/knob_movie.png");
+  volumeB->disabledImage().load(":/images/knob_disabled.png");
   volumeB->setFrameCount(61);
   volumeB->setEnabled(true);
   volumeB->setGeometry(x0 + 623, y0 + 336, 48, 48);
   volumeB->setTag(CC_VOLUME_B);
-  connect(volumeB, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
-  connect(volumeB, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
+  connect(volumeB, SIGNAL(valueChanged()), this, SLOT(rotaryChanged()));
+  connect(volumeB, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   reverbB = new QComboBox(this);
   reverbB->addItem("None");
@@ -942,143 +941,143 @@ void MainWindow::createEditArea()
   connect(reverbB, SIGNAL(currentIndexChanged(int)), this, SLOT(reverbBChanged(int)));
 
   reverbLedB = new QImageLED(this);
-  reverbLedB->getImage().load(":/images/led_yellow.png");
-  reverbLedB->getDisabledImage().load(":/images/led_yellow_disabled.png");
+  reverbLedB->image().load(":/images/led_yellow.png");
+  reverbLedB->disabledImage().load(":/images/led_yellow_disabled.png");
   reverbLedB->setGeometry(x0 + 244, y0 + 232, 31, 31);
   reverbLedB->setEnabled(true);
   reverbLedB->setValue(true);
 
   reverbBypassB = new QImageToggle(this);
   reverbBypassB->setGeometry(x0 + 275, y0 + 232, 44, 31);
-  reverbBypassB->getImage().load(":/images/onoff.png");
-  reverbBypassB->getDisabledImage().load(":/images/onoff_disabled.png");
+  reverbBypassB->image().load(":/images/onoff.png");
+  reverbBypassB->disabledImage().load(":/images/onoff_disabled.png");
   reverbBypassB->setEnabled(true);
   reverbBypassB->setTag(CC_REV_BYPASS_B);
   reverbBypassB->setLeftRight(true);
   reverbBypassB->setValue(true);
-  connect(reverbBypassB, SIGNAL(valueChanged(QImageToggle*, bool)), this, SLOT(toggleChanged(QImageToggle*, bool)));
+  connect(reverbBypassB, SIGNAL(valueChanged()), this, SLOT(toggleChanged()));
 
   reverbDecayB = new QImageDial(this);
-  reverbDecayB->getImage().load(":/images/knob_movie.png");
-  reverbDecayB->getDisabledImage().load(":/images/knob_disabled.png");
+  reverbDecayB->image().load(":/images/knob_movie.png");
+  reverbDecayB->disabledImage().load(":/images/knob_disabled.png");
   reverbDecayB->setFrameCount(61);
   reverbDecayB->setEnabled(true);
   reverbDecayB->setGeometry(x0 + 431, y0 + 235, 48, 48);
   reverbDecayB->setTag(CC_REV_DECAY_B);
-  connect(reverbDecayB, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
-  connect(reverbDecayB, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
+  connect(reverbDecayB, SIGNAL(valueChanged()), this, SLOT(rotaryChanged()));
+  connect(reverbDecayB, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   reverbPredelayB = new QImageDial(this);
-  reverbPredelayB->getImage().load(":/images/knob_movie.png");
-  reverbPredelayB->getDisabledImage().load(":/images/knob_disabled.png");
+  reverbPredelayB->image().load(":/images/knob_movie.png");
+  reverbPredelayB->disabledImage().load(":/images/knob_disabled.png");
   reverbPredelayB->setFrameCount(61);
   reverbPredelayB->setEnabled(true);
   reverbPredelayB->setGeometry(x0 + 495, y0 + 235, 48, 48);
   reverbPredelayB->setTag(CC_REV_PREDELAY_B);
-  connect(reverbPredelayB, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
-  connect(reverbPredelayB, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
+  connect(reverbPredelayB, SIGNAL(valueChanged()), this, SLOT(rotaryChanged()));
+  connect(reverbPredelayB, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   reverbToneB = new QImageDial(this);
-  reverbToneB->getImage().load(":/images/knob_movie.png");
-  reverbToneB->getDisabledImage().load(":/images/knob_disabled.png");
+  reverbToneB->image().load(":/images/knob_movie.png");
+  reverbToneB->disabledImage().load(":/images/knob_disabled.png");
   reverbToneB->setFrameCount(61);
   reverbToneB->setEnabled(true);
   reverbToneB->setGeometry(x0 + 559, y0 + 235, 48, 48);
   reverbToneB->setTag(CC_REV_TONE_B);
-  connect(reverbToneB, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
-  connect(reverbToneB, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
+  connect(reverbToneB, SIGNAL(valueChanged()), this, SLOT(rotaryChanged()));
+  connect(reverbToneB, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   reverbMixB = new QImageDial(this);
-  reverbMixB->getImage().load(":/images/knob_movie.png");
-  reverbMixB->getDisabledImage().load(":/images/knob_disabled.png");
+  reverbMixB->image().load(":/images/knob_movie.png");
+  reverbMixB->disabledImage().load(":/images/knob_disabled.png");
   reverbMixB->setFrameCount(61);
   reverbMixB->setEnabled(true);
   reverbMixB->setGeometry(x0 + 623, y0 + 235, 48, 48);
   reverbMixB->setTag(CC_REV_MIX_B);
-  connect(reverbMixB, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
-  connect(reverbMixB, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
+  connect(reverbMixB, SIGNAL(valueChanged()), this, SLOT(rotaryChanged()));
+  connect(reverbMixB, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   classB = new QImageToggle(this);
   classB->setGeometry(x0 + 720, y0 + 227, 64, 88);
-  classB->getImage().load(":/images/class.png");
-  classB->getDisabledImage().load(":/images/class_disabled.png");
+  classB->image().load(":/images/class.png");
+  classB->disabledImage().load(":/images/class_disabled.png");
   classB->setEnabled(true);
   classB->setTag(CC_CLASS_B);
-  connect(classB, SIGNAL(valueChanged(QImageToggle*, bool)), this, SLOT(toggleChanged(QImageToggle*, bool)));
+  connect(classB, SIGNAL(valueChanged()), this, SLOT(toggleChanged()));
 
   topolB = new QImageToggle4(this);
   topolB->setGeometry(x0 + 804, y0 + 242, 48, 48);
-  topolB->getImage().load(":/images/I_II_III_IV.png");
-  topolB->getDisabledImage().load(":/images/I_II_III_IV_disabled.png");
+  topolB->image().load(":/images/I_II_III_IV.png");
+  topolB->disabledImage().load(":/images/I_II_III_IV_disabled.png");
   topolB->setEnabled(true);
   topolB->setTag(CC_TOPOL_B);
-  connect(topolB, SIGNAL(valueChanged(QImageToggle4*, int)), this, SLOT(toggle4Changed(QImageToggle4*, int)));
+  connect(topolB, SIGNAL(valueChanged()), this, SLOT(toggle4Changed()));
 
   xtodeB = new QImageToggle(this);
   xtodeB->setGeometry(x0 + 871, y0 + 227, 64, 88);
-  xtodeB->getImage().load(":/images/xtode.png");
-  xtodeB->getDisabledImage().load(":/images/xtode_disabled.png");
+  xtodeB->image().load(":/images/xtode.png");
+  xtodeB->disabledImage().load(":/images/xtode_disabled.png");
   xtodeB->setEnabled(true);
   xtodeB->setTag(CC_XTODE_B);
-  connect(xtodeB, SIGNAL(valueChanged(QImageToggle*, bool)), this, SLOT(toggleChanged(QImageToggle*, bool)));
+  connect(xtodeB, SIGNAL(valueChanged()), this, SLOT(toggleChanged()));
 
   boostB = new QImageToggle(this);
   boostB->setGeometry(x0 + 720, y0 + 316, 64, 88);
-  boostB->getImage().load(":/images/boost.png");
-  boostB->getDisabledImage().load(":/images/boost_disabled.png");
+  boostB->image().load(":/images/boost.png");
+  boostB->disabledImage().load(":/images/boost_disabled.png");
   boostB->setEnabled(true);
   boostB->setTag(CC_BOOST_B);
-  connect(boostB, SIGNAL(valueChanged(QImageToggle*, bool)), this, SLOT(toggleChanged(QImageToggle*, bool)));
+  connect(boostB, SIGNAL(valueChanged()), this, SLOT(toggleChanged()));
 
   pivoltB = new QImageToggle(this);
   pivoltB->setGeometry(x0 + 795, y0 + 316, 64, 88);
-  pivoltB->getImage().load(":/images/piv.png");
-  pivoltB->getDisabledImage().load(":/images/piv_disabled.png");
+  pivoltB->image().load(":/images/piv.png");
+  pivoltB->disabledImage().load(":/images/piv_disabled.png");
   pivoltB->setEnabled(true);
   pivoltB->setTag(CC_PI_VOLTAGE_B);
-  connect(pivoltB, SIGNAL(valueChanged(QImageToggle*, bool)), this, SLOT(toggleChanged(QImageToggle*, bool)));
+  connect(pivoltB, SIGNAL(valueChanged()), this, SLOT(toggleChanged()));
 
   capB = new QImageToggle(this);
   capB->setGeometry(x0 + 871, y0 + 316, 64, 88);
-  capB->getImage().load(":/images/cap.png");
-  capB->getDisabledImage().load(":/images/cap_disabled.png");
+  capB->image().load(":/images/cap.png");
+  capB->disabledImage().load(":/images/cap_disabled.png");
   capB->setEnabled(true);
   capB->setTag(CC_CAP_TYPE_B);
-  connect(capB, SIGNAL(valueChanged(QImageToggle*, bool)), this, SLOT(toggleChanged(QImageToggle*, bool)));
+  connect(capB, SIGNAL(valueChanged()), this, SLOT(toggleChanged()));
 
   channel = new QImageToggle(this);
   channel->setGeometry(x0 + 39, y0 + 137, 64, 88);
-  channel->getImage().load(":/images/channel.png");
-  channel->getDisabledImage().load(":/images/channel_disabled.png");
+  channel->image().load(":/images/channel.png");
+  channel->disabledImage().load(":/images/channel_disabled.png");
   channel->setEnabled(true);
   channel->setTag(CC_CHANNEL);
-  connect(channel, SIGNAL(valueChanged(QImageToggle*, bool)), this, SLOT(toggleChanged(QImageToggle*, bool)));
+  connect(channel, SIGNAL(valueChanged()), this, SLOT(toggleChanged()));
 
   master = new QImageDial(this);
-  master->getImage().load(":/images/knob_movie.png");
-  master->getDisabledImage().load(":/images/knob_disabled.png");
+  master->image().load(":/images/knob_movie.png");
+  master->disabledImage().load(":/images/knob_disabled.png");
   master->setFrameCount(61);
   master->setEnabled(true);
   master->setGeometry(x0 + 140, y0 + 152, 48, 48);
   master->setTag(CC_MASTER_VOL);
-  connect(master, SIGNAL(valueChanged(QImageDial*, double)), this, SLOT(rotaryChanged(QImageDial*, double)));
-  connect(master, SIGNAL(mouseReleased(QImageDial*)), this, SLOT(rotaryReleased(QImageDial*)));
+  connect(master, SIGNAL(valueChanged()), this, SLOT(rotaryChanged()));
+  connect(master, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   lowVolLed = new QImageLED(this);
-  lowVolLed->getImage().load(":/images/led_red.png");
-  lowVolLed->getDisabledImage().load(":/images/led_red_disabled.png");
+  lowVolLed->image().load(":/images/led_red.png");
+  lowVolLed->disabledImage().load(":/images/led_red_disabled.png");
   lowVolLed->setGeometry(x0 + 171, y0 + 232, 31, 31);
   lowVolLed->setEnabled(true);
 
   lowVol = new QImageToggle(this);
   lowVol->setGeometry(x0 + 37, y0 + 232, 44, 31);
-  lowVol->getImage().load(":/images/onoff.png");
-  lowVol->getDisabledImage().load(":/images/onoff_disabled.png");
+  lowVol->image().load(":/images/onoff.png");
+  lowVol->disabledImage().load(":/images/onoff_disabled.png");
   lowVol->setEnabled(true);
   lowVol->setTag(CC_LOWVOLUME);
   lowVol->setLeftRight(true);
   lowVol->setValue(true);
-  connect(lowVol, SIGNAL(valueChanged(QImageToggle*, bool)), this, SLOT(toggleChanged(QImageToggle*, bool)));
+  connect(lowVol, SIGNAL(valueChanged()), this, SLOT(toggleChanged()));
 
   mic = new QComboBox(this);
   mic->addItem("None");
@@ -1096,17 +1095,17 @@ void MainWindow::createEditArea()
 
   QImageButton* midiButton = new QImageButton(this);
   midiButton->setGeometry(x0 + 11, y0 - 18, 65, 15);
-  midiButton->getImage().load(":/images/midi.png");
-  midiButton->getDisabledImage().load(":/images/midi_disabled.png");
+  midiButton->image().load(":/images/midi.png");
+  midiButton->disabledImage().load(":/images/midi_disabled.png");
   midiButton->setEnabled(true);
-  connect(midiButton, SIGNAL(clicked(QImageButton*)), this, SLOT(setupMIDI(QImageButton*)));
+  connect(midiButton, SIGNAL(clicked()), this, SLOT(setupMIDI()));
 
   QImageButton* aboutButton = new QImageButton(this);
   aboutButton->setGeometry(x0 + 80, y0 - 18, 65, 15);
-  aboutButton->getImage().load(":/images/about.png");
-  aboutButton->getDisabledImage().load(":/images/about_disabled.png");
+  aboutButton->image().load(":/images/about.png");
+  aboutButton->disabledImage().load(":/images/about_disabled.png");
   aboutButton->setEnabled(true);
-  connect(aboutButton, SIGNAL(clicked(QImageButton*)), this, SLOT(about(QImageButton*)));
+  connect(aboutButton, SIGNAL(clicked()), this, SLOT(about()));
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1193,10 +1192,9 @@ void MainWindow::sendBlockMessage(bool block)
 // MainWindow::about()
 ////////////////////////////////////////////////////////////////////////////////
 ///\brief   Handler for the about buton signal.
-///\param   [in] sender: The sending control.
 ///\remarks Shows an about box with informations about this application.
 ////////////////////////////////////////////////////////////////////////////////
-void MainWindow::about(QImageButton* /* sender */)
+void MainWindow::about()
 {
   // Create about box:
   AboutDialog dlg(this);
@@ -1207,10 +1205,9 @@ void MainWindow::about(QImageButton* /* sender */)
 // MainWindow::setupMIDI()
 ////////////////////////////////////////////////////////////////////////////////
 ///\brief   Handler for the File->Setup signal.
-///\param   [in] sender: The sending control.
 ///\remarks Shows the MIDI setup dialog.
 ////////////////////////////////////////////////////////////////////////////////
-void MainWindow::setupMIDI(QImageButton* /* sender */)
+void MainWindow::setupMIDI()
 {
   while (true)
   {
@@ -1234,21 +1231,24 @@ void MainWindow::setupMIDI(QImageButton* /* sender */)
 ////////////////////////////////////////////////////////////////////////////////
 // MainWindow::rotaryChanged()
 ////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the dial changed event.
-///\param   [in] sender: The sending control.
-///\param   [in] newVal: The new value.
+///\brief Handler for the dial changed event.
 ////////////////////////////////////////////////////////////////////////////////
-void MainWindow::rotaryChanged(QImageDial* sender, double newVal)
+void MainWindow::rotaryChanged()
 {
   // Is the UI locked?
   if (blocked)
+    return;
+
+  // Get sending control:
+  QImageDial* dial = qobject_cast<QImageDial*>(sender());
+  if (dial == 0)
     return;
 
   // Block user interface:
   sendBlockMessage(true);
 
   // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, sender->getTag(), (int)(newVal * 127.0) & 0xFF);
+  sendControlChange(DT_MIDI_CHANNEL, dial->tag(), (int)(dial->value() * 127.0) & 0xFF);
 
   // Release the user interface:
   sendBlockMessage(false);
@@ -1257,10 +1257,9 @@ void MainWindow::rotaryChanged(QImageDial* sender, double newVal)
 ////////////////////////////////////////////////////////////////////////////////
 // MainWindow::rotaryReleased()
 ////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the dial released event.
-///\param   [in] sender: The sending control.
+///\brief Handler for the dial released event.
 ////////////////////////////////////////////////////////////////////////////////
-void MainWindow::rotaryReleased(QImageDial* /* sender */)
+void MainWindow::rotaryReleased()
 {
   // Release the user interface:
   sendBlockMessage(false);
@@ -1269,61 +1268,67 @@ void MainWindow::rotaryReleased(QImageDial* /* sender */)
 ////////////////////////////////////////////////////////////////////////////////
 // MainWindow::toggleChanged()
 ////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the toggle changed event.
-///\param   [in] sender: The sending control.
-///\param   [in] newVal: The new value.
+///\brief Handler for the toggle changed event.
 ////////////////////////////////////////////////////////////////////////////////
-void MainWindow::toggleChanged(QImageToggle* sender, bool newVal)
+void MainWindow::toggleChanged()
 {
   // Is the UI locked?
   if (blocked)
+    return;
+
+  // Get sending control:
+  QImageToggle* toggle = qobject_cast<QImageToggle*>(sender());
+  if (toggle == 0)
     return;
 
   // Block user interface:
   sendBlockMessage(true);
 
   // Send the value:
-  if (sender->getTag() == CC_CHANNEL || sender->getTag() == CC_LOWVOLUME)
-    sendControlChange(DT_MIDI_CHANNEL, sender->getTag(), newVal ? : 127);
+  if (toggle->tag() == CC_CHANNEL || toggle->tag() == CC_LOWVOLUME)
+    sendControlChange(DT_MIDI_CHANNEL, toggle->tag(), toggle->value() ? : 127);
   else
-    sendControlChange(DT_MIDI_CHANNEL, sender->getTag(), newVal ? 127 : 0);
+    sendControlChange(DT_MIDI_CHANNEL, toggle->tag(), toggle->value() ? 127 : 0);
 
   // Release the user interface:
   sendBlockMessage(false);
 
   // Update LEDs if needed:
-  if (sender->getTag() == CC_REV_BYPASS_A)
-    reverbLedA->setValue(newVal);
-  else if (sender->getTag() == CC_REV_BYPASS_B)
-    reverbLedB->setValue(newVal);
-  if (sender->getTag() == CC_LOWVOLUME)
-    lowVolLed->setValue(!newVal);
+  if (toggle->tag() == CC_REV_BYPASS_A)
+    reverbLedA->setValue(toggle->value());
+  else if (toggle->tag() == CC_REV_BYPASS_B)
+    reverbLedB->setValue(toggle->value());
+  if (toggle->tag() == CC_LOWVOLUME)
+    lowVolLed->setValue(!toggle->value());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 // MainWindow::toggle4Changed()
 ////////////////////////////////////////////////////////////////////////////////
-///\brief   Handler for the toggle changed event.
-///\param   [in] sender: The sending control.
-///\param   [in] newVal: The new value.
+///\brief Handler for the toggle changed event.
 ////////////////////////////////////////////////////////////////////////////////
-void MainWindow::toggle4Changed(QImageToggle4* sender, int newVal)
+void MainWindow::toggle4Changed()
 {
   // Is the UI locked?
   if (blocked)
+    return;
+
+  // Get sending control:
+  QImageToggle4* toggle = qobject_cast<QImageToggle4*>(sender());
+  if (toggle == 0)
     return;
 
   // Block user interface:
   sendBlockMessage(true);
 
   // Send the value:
-  sendControlChange(DT_MIDI_CHANNEL, sender->getTag(), newVal);
+  sendControlChange(DT_MIDI_CHANNEL, toggle->tag(), toggle->value());
 
   // Release the user interface:
   sendBlockMessage(false);
 
   // Sync state:
-  if (sender->getTag() == CC_VOICE_A || sender->getTag() == CC_VOICE_B)
+  if (toggle->tag() == CC_VOICE_A || toggle->tag() == CC_VOICE_B)
     getValuesFromDT();
 }
 
