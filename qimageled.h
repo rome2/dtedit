@@ -25,7 +25,7 @@
 #ifndef __QIMAGELED_H_INCLUDED__
 #define __QIMAGELED_H_INCLUDED__
 
-#include <QtGui>
+#include "qimagewidget.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 ///\class QImageLED qimageled.h
@@ -35,14 +35,14 @@
 /// Simple usage example:
 ///
 /// QImageLED* led = new QImageLED(this);
-/// led->getImage().load(":/images/led.png");
-/// led->getDisabledImage().load(":/images/led_disabled.png");
+/// led->image().load(":/images/led.png");
+/// led->disabledImage().load(":/images/led_disabled.png");
 /// led->setGeometry(10, 10, 40, 40);
 /// led->setEnabled(true);
 ///
 ////////////////////////////////////////////////////////////////////////////////
 class QImageLED :
-  public QWidget
+  public QImageWidget
 {
   Q_OBJECT// Qt magic...
 
@@ -56,9 +56,8 @@ public:
   ///\remarks Just initializes the members.
   //////////////////////////////////////////////////////////////////////////////
   QImageLED(QWidget* parent = 0) :
-    QWidget(parent),
-    value(false),
-    tag(0)
+    QImageWidget(parent),
+    m_value(false)
   {
     // Nothing to do here.
   }
@@ -75,16 +74,16 @@ public:
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // QImageLED::getValue()
+  // QImageLED::value()
   //////////////////////////////////////////////////////////////////////////////
   ///\brief   Get accessor for the Value property.
   ///\return  The current value of this dial.
   ///\remarks The value is either true or false.
   //////////////////////////////////////////////////////////////////////////////
-  bool getValue() const
+  bool value() const
   {
     // Return current value:
-    return value;
+    return m_value;
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -98,173 +97,51 @@ public:
   void setValue(const bool newVal)
   {
     // Anything to do?
-    if (value == newVal)
+    if (m_value == newVal)
       return;
 
     // Set new value:
-    value = newVal;
+    m_value = newVal;
 
     // Force redraw:
     update();
   }
 
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageLED::getImage()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Get accessor for the Image property.
-  ///\return  The current image.
-  ///\remarks This image is the source for the toggle. It must contain two sub
-  ///         pictures ordered from left to right.
-  //////////////////////////////////////////////////////////////////////////////
-  QImage& getImage()
-  {
-    // Return our image:
-    return image;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageLED::getImage()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Get accessor for the Image property, const version.
-  ///\return  The current image.
-  ///\remarks This image is the source for the toggle. It must contain two sub
-  ///         pictures ordered from left to right.
-  //////////////////////////////////////////////////////////////////////////////
-  const QImage& getImage() const
-  {
-    // Return our image:
-    return image;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageLED::getDisabledImage()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Get accessor for the DisabledImage property.
-  ///\return  The current disabled state image.
-  ///\remarks This image is shown when the widget is disabled. It should have
-  ///         the same size as one frame of the toggle image.
-  //////////////////////////////////////////////////////////////////////////////
-  QImage& getDisabledImage()
-  {
-    // Return our image:
-    return disabledImage;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageLED::getDisabledImage()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Get accessor for the DisabledImage property, const version.
-  ///\return  The current disabled state image.
-  ///\remarks This image is shown when the widget is disabled. It should have
-  ///         the same size as one frame of the toggle image.
-  //////////////////////////////////////////////////////////////////////////////
-  const QImage& getDisabledImage() const
-  {
-    // Return our image:
-    return disabledImage;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageLED::getTag()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Get accessor for the Tag property.
-  ///\return  The currently stored user value.
-  ///\remarks This tag is an arbitrary user defined value.
-  //////////////////////////////////////////////////////////////////////////////
-  int getTag() const
-  {
-    // Return current tag:
-    return tag;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageLED::setTag()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Set accessor for the Tag property.
-  ///\param   [in] newTag: The new user defined value.
-  ///\remarks This tag is an arbitrary user defined value.
-  //////////////////////////////////////////////////////////////////////////////
-  void setTag(const int newTag)
-  {
-    // Set new tag:
-    tag = newTag;
-  }
-
 protected:
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageLED::paintEvent()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the paint signal.
-  ///\param   [in] event: Provides further details about the event.
-  //////////////////////////////////////////////////////////////////////////////
-  void paintEvent(QPaintEvent* event)
-  {
-    // Do we have a movie?
-    if (image.isNull())
-    {
-      // Let the base class do the painting:
-      QWidget::paintEvent(event);
-      return;
-    }
-
-    // Draw the movie:
-    QPainter qp(this);
-    drawWidget(qp);
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageLED::changeEvent()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for general state change signals.
-  ///\param   [in] event: Provides further details about the event.
-  //////////////////////////////////////////////////////////////////////////////
-  void changeEvent(QEvent* event)
-  {
-    // Base handling:
-    QWidget::changeEvent(event);
-
-    // Redraw if the enabled state changed:
-    if (event->type() == QEvent::EnabledChange)
-      update();
-  }
-
-private:
 
   //////////////////////////////////////////////////////////////////////////////
   // QImageLED::drawWidget()
   //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Internal helperthat paints the actual widget.
-  ///\param   [in] qp: Device context to use.
+  ///\brief Internal helper that paints the actual widget.
+  ///\param [in] qp: Device context to use.
   //////////////////////////////////////////////////////////////////////////////
-  void drawWidget(QPainter& qp)
+  virtual void drawWidget(QPainter& qp)
   {
-    if (isEnabled() || disabledImage.isNull())
+    if (isEnabled() || disabledImage().isNull())
     {
       // Get size of a single sub image:
-      int w = image.width() / 2;
-      int h = image.height();
+      int w = image().width() / 2;
+      int h = image().height();
 
       // Calc source position:
-      int x = value ? w : 0;
+      int x = m_value ? w : 0;
 
       // Finally blit the image:
-      qp.drawImage(0, 0, image, x, 0, w, h);
+      qp.drawImage(0, 0, image(), x, 0, w, h);
     }
 
     else
     {
       // Just show the disabled image:
-      qp.drawImage(0, 0, disabledImage);
+      qp.drawImage(0, 0, disabledImage());
     }
   }
 
+private:
+
   //////////////////////////////////////////////////////////////////////////////
   // Member:
-  QImage image;         ///\> The knob movie image strip.
-  QImage disabledImage; ///\> The knob movie image strip.
-  bool value;           ///\> The current value of this toggle.
-  int tag;              ///\> User defined value.
+  bool m_value; ///\> The current value of this toggle.
 };
 
 #endif // __QIMAGELED_H_INCLUDED__

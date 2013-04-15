@@ -25,14 +25,14 @@
 #ifndef __QIMAGETOGGLE4_H_INCLUDED__
 #define __QIMAGETOGGLE4_H_INCLUDED__
 
-#include <QtGui>
+#include "qimagewidget.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 ///\class QImageToggle qimagetoggle4.h
 ///\brief -
 ////////////////////////////////////////////////////////////////////////////////
 class QImageToggle4 :
-  public QWidget
+  public QImageWidget
 {
   Q_OBJECT// Qt magic...
 
@@ -46,8 +46,8 @@ public:
   ///\remarks Just initializes the members.
   //////////////////////////////////////////////////////////////////////////////
   QImageToggle4(QWidget* parent = 0) :
-    QWidget(parent),
-    value(0)
+    QImageWidget(parent),
+    m_value(0)
   {
     // Nothing to do here.
   }
@@ -64,16 +64,16 @@ public:
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // QImageToggle4::getValue()
+  // QImageToggle4::value()
   //////////////////////////////////////////////////////////////////////////////
   ///\brief   Get accessor for the Value property.
   ///\return  The current value of this toggle.
   ///\remarks The value is either 0, 1, 2 or 3.
   //////////////////////////////////////////////////////////////////////////////
-  int getValue() const
+  int value() const
   {
     // Return current value:
-    return value;
+    return m_value;
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -87,100 +87,18 @@ public:
   void setValue(const int newVal)
   {
     // Anything to do?
-    if (value == newVal)
+    if (m_value == newVal)
       return;
 
     // Set new value:
-    value = newVal;
+    m_value = newVal;
 
     // Force redraw:
     update();
 
     // Notify listeners:
     if (!signalsBlocked())
-      emit valueChanged(this, value);
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageToggle4::getImage()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Get accessor for the Image property.
-  ///\return  The current image.
-  ///\remarks This image is the source for the toggle. It must contain two sub
-  ///         pictures ordered from left to right.
-  //////////////////////////////////////////////////////////////////////////////
-  QImage& getImage()
-  {
-    // Return our image:
-    return image;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageToggle4::getImage()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Get accessor for the Image property, const version.
-  ///\return  The current image.
-  ///\remarks This image is the source for the toggle. It must contain two sub
-  ///         pictures ordered from left to right.
-  //////////////////////////////////////////////////////////////////////////////
-  const QImage& getImage() const
-  {
-    // Return our image:
-    return image;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageToggle4::getDisabledImage()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Get accessor for the DisabledImage property.
-  ///\return  The current disabled state image.
-  ///\remarks This image is shown when the widget is disabled. It should have
-  ///         the same size as one frame of the toggle image.
-  //////////////////////////////////////////////////////////////////////////////
-  QImage& getDisabledImage()
-  {
-    // Return our image:
-    return disabledImage;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageToggle4::getDisabledImage()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Get accessor for the DisabledImage property, const version.
-  ///\return  The current disabled state image.
-  ///\remarks This image is shown when the widget is disabled. It should have
-  ///         the same size as one frame of the toggle image.
-  //////////////////////////////////////////////////////////////////////////////
-  const QImage& getDisabledImage() const
-  {
-    // Return our image:
-    return disabledImage;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageToggle4::getTag()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Get accessor for the Tag property.
-  ///\return  The currently stored user value.
-  ///\remarks This tag is an arbitrary user defined value.
-  //////////////////////////////////////////////////////////////////////////////
-  int getTag() const
-  {
-    // Return current tag:
-    return tag;
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageToggle4::setTag()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Set accessor for the Tag property.
-  ///\param   [in] newTag: The new user defined value.
-  ///\remarks This tag is an arbitrary user defined value.
-  //////////////////////////////////////////////////////////////////////////////
-  void setTag(const int newTag)
-  {
-    // Set new tag:
-    tag = newTag;
+      emit valueChanged();
   }
 
 signals:
@@ -188,56 +106,17 @@ signals:
   //////////////////////////////////////////////////////////////////////////////
   // QImageToggle4::valueChanged()
   //////////////////////////////////////////////////////////////////////////////
-  ///\brief   This signal is emitted when the value of this toggle changes.
-  ///\param   [in] sender: The sending control.
-  ///\param   [in] newVal: The new value.
+  ///\brief This signal is emitted when the value of this toggle changes.
   //////////////////////////////////////////////////////////////////////////////
-  void valueChanged(QImageToggle4* sender, int newVal);
+  void valueChanged();
 
 protected:
 
   //////////////////////////////////////////////////////////////////////////////
-  // QImageToggle4::paintEvent()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the paint signal.
-  ///\param   [in] event: Provides further details about the event.
-  //////////////////////////////////////////////////////////////////////////////
-  void paintEvent(QPaintEvent* event)
-  {
-    // Do we have a movie?
-    if (image.isNull())
-    {
-      // Let the base class do the painting:
-      QWidget::paintEvent(event);
-      return;
-    }
-
-    // Draw the movie:
-    QPainter qp(this);
-    drawWidget(qp);
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
-  // QImageToggle4::changeEvent()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for general state change signals.
-  ///\param   [in] event: Provides further details about the event.
-  //////////////////////////////////////////////////////////////////////////////
-  void changeEvent(QEvent* event)
-  {
-    // Base handling:
-    QWidget::changeEvent(event);
-
-    // Redraw if the enabled state changed:
-    if (event->type() == QEvent::EnabledChange)
-      update();
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
   // QImageToggle4::mousePressEvent()
   //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the mouse button pressed signal.
-  ///\param   [in] event: Provides further details about the event.
+  ///\brief Handler for the mouse button pressed signal.
+  ///\param [in] event: Provides further details about the event.
   //////////////////////////////////////////////////////////////////////////////
   void mousePressEvent(QMouseEvent* event)
   {
@@ -249,16 +128,16 @@ protected:
     if (event->buttons() == Qt::LeftButton)
     {
       // Save start position:
-      startPos.setX(event->x());
-      startPos.setY(event->y());
+      m_startPos.setX(event->x());
+      m_startPos.setY(event->y());
     }
   }
 
   //////////////////////////////////////////////////////////////////////////////
   // QImageToggle4::mouseReleaseEvent()
   //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Handler for the mouse button released signal.
-  ///\param   [in] event: Provides further details about the event.
+  ///\brief Handler for the mouse button released signal.
+  ///\param [in] event: Provides further details about the event.
   //////////////////////////////////////////////////////////////////////////////
   void mouseReleaseEvent(QMouseEvent* event)
   {
@@ -279,11 +158,38 @@ protected:
       int newVal = valueFromMousePos(event->x(), event->y());
 
       // Compare to start position:
-      if (newVal != valueFromMousePos(startPos.x(), startPos.y()))
+      if (newVal != valueFromMousePos(m_startPos.x(), m_startPos.y()))
         return;
 
       // Update widget:
       setValue(newVal);
+    }
+  }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // QImageToggle4::drawWidget()
+  //////////////////////////////////////////////////////////////////////////////
+  ///\brief Internal helper that paints the actual widget.
+  ///\param [in] qp: Device context to use.
+  //////////////////////////////////////////////////////////////////////////////
+  virtual void drawWidget(QPainter& qp)
+  {
+    if (isEnabled() || disabledImage().isNull())
+    {
+      // Get size of a single sub image:
+      int w = image().width() / 4;
+      int h = image().height();
+
+      // Calc source position:
+      int x = m_value * w;
+
+      // Finally blit the image:
+      qp.drawImage(0, 0, image(), x, 0, w, h);
+    }
+    else
+    {
+      // Just show the disabled image:
+      qp.drawImage(0, 0, disabledImage());
     }
   }
 
@@ -292,10 +198,10 @@ private:
   //////////////////////////////////////////////////////////////////////////////
   // QImageToggle4::valueFromMousePos()
   //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Internal helper to calc a value for mouse coordinates.
-  ///\param   [in] mx: Input position, X component.
-  ///\param   [in] my: Input position, Y component.
-  ///\return  The matching value for the input coordinates.
+  ///\brief  Internal helper to calc a value for mouse coordinates.
+  ///\param  [in] mx: Input position, X component.
+  ///\param  [in] my: Input position, Y component.
+  ///\return The matching value for the input coordinates.
   //////////////////////////////////////////////////////////////////////////////
   int valueFromMousePos(const int mx, const int my) const
   {
@@ -315,39 +221,9 @@ private:
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // QImageToggle4::drawWidget()
-  //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Internal helperthat paints the actual widget.
-  ///\param   [in] qp: Device context to use.
-  //////////////////////////////////////////////////////////////////////////////
-  void drawWidget(QPainter& qp)
-  {
-    if (isEnabled() || disabledImage.isNull())
-    {
-      // Get size of a single sub image:
-      int w = image.width() / 4;
-      int h = image.height();
-
-      // Calc source position:
-      int x = value * w;
-
-      // Finally blit the image:
-      qp.drawImage(0, 0, image, x, 0, w, h);
-    }
-    else
-    {
-      // Just show the disabled image:
-      qp.drawImage(0, 0, disabledImage);
-    }
-  }
-
-  //////////////////////////////////////////////////////////////////////////////
   // Member:
-  QPoint startPos;      ///\> Mouse down position.
-  QImage image;         ///\> The knob movie image strip.
-  QImage disabledImage; ///\> The knob movie image strip.
-  int value;            ///\> The current value of this toggle.
-  int tag;              ///\> User defined value.
+  QPoint m_startPos; ///\> Mouse down position.
+  int    m_value;    ///\> The current value of this toggle.
 };
 
 #endif // __QIMAGETOGGLE4_H_INCLUDED__
