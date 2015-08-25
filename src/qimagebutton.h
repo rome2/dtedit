@@ -174,12 +174,12 @@ protected:
       int x = m_down ? w : 0;
 
       // Finally blit the image:
-      qp.drawImage(0, 0, image(), x, 0, w, h);
+      qp.drawPixmap(0, 0, image(), x, 0, w, h);
     }
     else
     {
       // Just show the disabled image:
-      qp.drawImage(0, 0, disabledImage());
+      qp.drawPixmap(0, 0, disabledImage());
     }
   }
 

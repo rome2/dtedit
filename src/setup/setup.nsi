@@ -17,7 +17,7 @@ RequestExecutionLevel admin
 InstallDir "$PROGRAMFILES\${APPNAME}"
 
 # rtf or txt file - remember if it is txt, it must be in the DOS text format (\r\n)
-LicenseData "..\COPYING.rtf"
+LicenseData "..\..\COPYING.rtf"
 
 # This will be in the installer/uninstaller's title bar
 Name "${APPNAME}"
@@ -58,7 +58,7 @@ section "install"
   file external\QtXml4.dll
   file ..\release\dtedit.exe
   file ..\images\dtedit.ico
-  file ..\COPYING.rtf
+  file ..\..\COPYING.rtf
 
 	# Uninstaller - See function un.onInit and section "uninstall" for configuration
 	writeUninstaller "$INSTDIR\uninstall.exe"

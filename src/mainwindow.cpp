@@ -545,10 +545,37 @@ void MainWindow::createEditArea()
   QString comboStyle("QComboBox { background: #202020; color: white; border: 1px solid #606060; }");
   #endif
 
+  QPixmap I_II_III_IV(":/images/I_II_III_IV.png");
+  QPixmap I_II_III_IV_disabled(":/images/I_II_III_IV_disabled.png");
+  QPixmap knob_movie(":/images/knob_movie.png");
+  QPixmap knob_disabled(":/images/knob_disabled.png");
+  QPixmap led_yellow(":/images/led_yellow.png");
+  QPixmap led_yellow_disabled(":/images/led_yellow_disabled.png");
+  QPixmap onoff(":/images/onoff.png");
+  QPixmap onoff_disabled(":/images/onoff_disabled.png");
+  QPixmap classAB(":/images/class.png");
+  QPixmap class_disabled(":/images/class_disabled.png");
+  QPixmap xtode(":/images/xtode.png");
+  QPixmap xtode_disabled(":/images/xtode_disabled.png");
+  QPixmap boost(":/images/boost.png");
+  QPixmap boost_disabled(":/images/boost_disabled.png");
+  QPixmap piv(":/images/piv.png");
+  QPixmap piv_disabled(":/images/piv_disabled.png");
+  QPixmap cap(":/images/cap.png");
+  QPixmap cap_disabled(":/images/cap_disabled.png");
+  QPixmap channelImg(":/images/channel.png");
+  QPixmap channel_disabled(":/images/channel_disabled.png");
+  QPixmap led_red(":/images/led_red.png");
+  QPixmap led_red_disabled(":/images/led_red_disabled.png");
+  QPixmap midi(":/images/midi.png");
+  QPixmap midi_disabled(":/images/midi_disabled.png");
+  QPixmap about(":/images/about.png");
+  QPixmap about_disabled(":/images/about_disabled.png");
+
   voiceA = new QImageToggle4(this);
   voiceA->setGeometry(x0 + 34, y0 + 30, 48, 48);
-  voiceA->image().load(":/images/I_II_III_IV.png");
-  voiceA->disabledImage().load(":/images/I_II_III_IV_disabled.png");
+  voiceA->setImage(I_II_III_IV);
+  voiceA->setDisabledImage(I_II_III_IV_disabled);
   voiceA->setEnabled(true);
   voiceA->setTag(CC_VOICE_A);
   connect(voiceA, SIGNAL(valueChanged()), this, SLOT(toggle4Changed()));
@@ -613,8 +640,8 @@ void MainWindow::createEditArea()
   connect(cabA, SIGNAL(currentIndexChanged(int)), this, SLOT(cabAChanged(int)));
 
   gainA = new QImageDial(this);
-  gainA->image().load(":/images/knob_movie.png");
-  gainA->disabledImage().load(":/images/knob_disabled.png");
+  gainA->setImage(knob_movie);
+  gainA->setDisabledImage(knob_disabled);
   gainA->setFrameCount(61);
   gainA->setEnabled(true);
   gainA->setGeometry(x0 + 303, y0 + 30, 48, 48);
@@ -623,8 +650,8 @@ void MainWindow::createEditArea()
   connect(gainA, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   bassA = new QImageDial(this);
-  bassA->image().load(":/images/knob_movie.png");
-  bassA->disabledImage().load(":/images/knob_disabled.png");
+  bassA->setImage(knob_movie);
+  bassA->setDisabledImage(knob_disabled);
   bassA->setFrameCount(61);
   bassA->setEnabled(true);
   bassA->setGeometry(x0 + 367, y0 + 30, 48, 48);
@@ -633,8 +660,8 @@ void MainWindow::createEditArea()
   connect(bassA, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   middleA = new QImageDial(this);
-  middleA->image().load(":/images/knob_movie.png");
-  middleA->disabledImage().load(":/images/knob_disabled.png");
+  middleA->setImage(knob_movie);
+  middleA->setDisabledImage(knob_disabled);
   middleA->setFrameCount(61);
   middleA->setEnabled(true);
   middleA->setGeometry(x0 + 431, y0 + 30, 48, 48);
@@ -643,8 +670,8 @@ void MainWindow::createEditArea()
   connect(middleA, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   trebleA = new QImageDial(this);
-  trebleA->image().load(":/images/knob_movie.png");
-  trebleA->disabledImage().load(":/images/knob_disabled.png");
+  trebleA->setImage(knob_movie);
+  trebleA->setDisabledImage(knob_disabled);
   trebleA->setFrameCount(61);
   trebleA->setEnabled(true);
   trebleA->setGeometry(x0 + 495, y0 + 30, 48, 48);
@@ -653,8 +680,8 @@ void MainWindow::createEditArea()
   connect(trebleA, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   presenceA = new QImageDial(this);
-  presenceA->image().load(":/images/knob_movie.png");
-  presenceA->disabledImage().load(":/images/knob_disabled.png");
+  presenceA->setImage(knob_movie);
+  presenceA->setDisabledImage(knob_disabled);
   presenceA->setFrameCount(61);
   presenceA->setEnabled(true);
   presenceA->setGeometry(x0 + 559, y0 + 30, 48, 48);
@@ -663,8 +690,8 @@ void MainWindow::createEditArea()
   connect(presenceA, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   volumeA = new QImageDial(this);
-  volumeA->image().load(":/images/knob_movie.png");
-  volumeA->disabledImage().load(":/images/knob_disabled.png");
+  volumeA->setImage(knob_movie);
+  volumeA->setDisabledImage(knob_disabled);
   volumeA->setFrameCount(61);
   volumeA->setEnabled(true);
   volumeA->setGeometry(x0 + 623, y0 + 30, 48, 48);
@@ -691,16 +718,16 @@ void MainWindow::createEditArea()
   connect(reverbA, SIGNAL(currentIndexChanged(int)), this, SLOT(reverbAChanged(int)));
 
   reverbLedA = new QImageLED(this);
-  reverbLedA->image().load(":/images/led_yellow.png");
-  reverbLedA->disabledImage().load(":/images/led_yellow_disabled.png");
+  reverbLedA->setImage(led_yellow);
+  reverbLedA->setDisabledImage(led_yellow_disabled);
   reverbLedA->setGeometry(x0 + 244, y0 + 130, 31, 31);
   reverbLedA->setEnabled(true);
   reverbLedA->setValue(true);
 
   reverbBypassA = new QImageToggle(this);
   reverbBypassA->setGeometry(x0 + 275, y0 + 130, 44, 31);
-  reverbBypassA->image().load(":/images/onoff.png");
-  reverbBypassA->disabledImage().load(":/images/onoff_disabled.png");
+  reverbBypassA->setImage(onoff);
+  reverbBypassA->setDisabledImage(onoff_disabled);
   reverbBypassA->setEnabled(true);
   reverbBypassA->setTag(CC_REV_BYPASS_A);
   reverbBypassA->setLeftRight(true);
@@ -708,8 +735,8 @@ void MainWindow::createEditArea()
   connect(reverbBypassA, SIGNAL(valueChanged()), this, SLOT(toggleChanged()));
 
   reverbDecayA = new QImageDial(this);
-  reverbDecayA->image().load(":/images/knob_movie.png");
-  reverbDecayA->disabledImage().load(":/images/knob_disabled.png");
+  reverbDecayA->setImage(knob_movie);
+  reverbDecayA->setDisabledImage(knob_disabled);
   reverbDecayA->setFrameCount(61);
   reverbDecayA->setEnabled(true);
   reverbDecayA->setGeometry(x0 + 431, y0 + 133, 48, 48);
@@ -718,8 +745,8 @@ void MainWindow::createEditArea()
   connect(reverbDecayA, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   reverbPredelayA = new QImageDial(this);
-  reverbPredelayA->image().load(":/images/knob_movie.png");
-  reverbPredelayA->disabledImage().load(":/images/knob_disabled.png");
+  reverbPredelayA->setImage(knob_movie);
+  reverbPredelayA->setDisabledImage(knob_disabled);
   reverbPredelayA->setFrameCount(61);
   reverbPredelayA->setEnabled(true);
   reverbPredelayA->setGeometry(x0 + 495, y0 + 133, 48, 48);
@@ -728,8 +755,8 @@ void MainWindow::createEditArea()
   connect(reverbPredelayA, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   reverbToneA = new QImageDial(this);
-  reverbToneA->image().load(":/images/knob_movie.png");
-  reverbToneA->disabledImage().load(":/images/knob_disabled.png");
+  reverbToneA->setImage(knob_movie);
+  reverbToneA->setDisabledImage(knob_disabled);
   reverbToneA->setFrameCount(61);
   reverbToneA->setEnabled(true);
   reverbToneA->setGeometry(x0 + 559, y0 + 133, 48, 48);
@@ -738,8 +765,8 @@ void MainWindow::createEditArea()
   connect(reverbToneA, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   reverbMixA = new QImageDial(this);
-  reverbMixA->image().load(":/images/knob_movie.png");
-  reverbMixA->disabledImage().load(":/images/knob_disabled.png");
+  reverbMixA->setImage(knob_movie);
+  reverbMixA->setDisabledImage(knob_disabled);
   reverbMixA->setFrameCount(61);
   reverbMixA->setEnabled(true);
   reverbMixA->setGeometry(x0 + 623, y0 + 133, 48, 48);
@@ -749,56 +776,56 @@ void MainWindow::createEditArea()
 
   classA = new QImageToggle(this);
   classA->setGeometry(x0 + 720, y0 + 23, 64, 88);
-  classA->image().load(":/images/class.png");
-  classA->disabledImage().load(":/images/class_disabled.png");
+  classA->setImage(classAB);
+  classA->setDisabledImage(class_disabled);
   classA->setEnabled(true);
   classA->setTag(CC_CLASS_A);
   connect(classA, SIGNAL(valueChanged()), this, SLOT(toggleChanged()));
 
   topolA = new QImageToggle4(this);
   topolA->setGeometry(x0 + 804, y0 + 38, 48, 48);
-  topolA->image().load(":/images/I_II_III_IV.png");
-  topolA->disabledImage().load(":/images/I_II_III_IV_disabled.png");
+  topolA->setImage(I_II_III_IV);
+  topolA->setDisabledImage(I_II_III_IV_disabled);
   topolA->setEnabled(true);
   topolA->setTag(CC_TOPOL_A);
   connect(topolA, SIGNAL(valueChanged()), this, SLOT(toggle4Changed()));
 
   xtodeA = new QImageToggle(this);
   xtodeA->setGeometry(x0 + 871, y0 + 23, 64, 88);
-  xtodeA->image().load(":/images/xtode.png");
-  xtodeA->disabledImage().load(":/images/xtode_disabled.png");
+  xtodeA->setImage(xtode);
+  xtodeA->setDisabledImage(xtode_disabled);
   xtodeA->setEnabled(true);
   xtodeA->setTag(CC_XTODE_A);
   connect(xtodeA, SIGNAL(valueChanged()), this, SLOT(toggleChanged()));
 
   boostA = new QImageToggle(this);
   boostA->setGeometry(x0 + 720, y0 + 112, 64, 88);
-  boostA->image().load(":/images/boost.png");
-  boostA->disabledImage().load(":/images/boost_disabled.png");
+  boostA->setImage(boost);
+  boostA->setDisabledImage(boost_disabled);
   boostA->setEnabled(true);
   boostA->setTag(CC_BOOST_A);
   connect(boostA, SIGNAL(valueChanged()), this, SLOT(toggleChanged()));
 
   pivoltA = new QImageToggle(this);
   pivoltA->setGeometry(x0 + 795, y0 + 112, 64, 88);
-  pivoltA->image().load(":/images/piv.png");
-  pivoltA->disabledImage().load(":/images/piv_disabled.png");
+  pivoltA->setImage(piv);
+  pivoltA->setDisabledImage(piv_disabled);
   pivoltA->setEnabled(true);
   pivoltA->setTag(CC_PI_VOLTAGE_A);
   connect(pivoltA, SIGNAL(valueChanged()), this, SLOT(toggleChanged()));
 
   capA = new QImageToggle(this);
   capA->setGeometry(x0 + 871, y0 + 112, 64, 88);
-  capA->image().load(":/images/cap.png");
-  capA->disabledImage().load(":/images/cap_disabled.png");
+  capA->setImage(cap);
+  capA->setDisabledImage(cap_disabled);
   capA->setEnabled(true);
   capA->setTag(CC_CAP_TYPE_A);
   connect(capA, SIGNAL(valueChanged()), this, SLOT(toggleChanged()));
 
   voiceB = new QImageToggle4(this);
   voiceB->setGeometry(x0 + 34, y0 + 336, 48, 48);
-  voiceB->image().load(":/images/I_II_III_IV.png");
-  voiceB->disabledImage().load(":/images/I_II_III_IV_disabled.png");
+  voiceB->setImage(I_II_III_IV);
+  voiceB->setDisabledImage(I_II_III_IV_disabled);
   voiceB->setEnabled(true);
   voiceB->setTag(CC_VOICE_B);
   connect(voiceB, SIGNAL(valueChanged()), this, SLOT(toggle4Changed()));
@@ -863,8 +890,8 @@ void MainWindow::createEditArea()
   connect(cabB, SIGNAL(currentIndexChanged(int)), this, SLOT(cabBChanged(int)));
 
   gainB = new QImageDial(this);
-  gainB->image().load(":/images/knob_movie.png");
-  gainB->disabledImage().load(":/images/knob_disabled.png");
+  gainB->setImage(knob_movie);
+  gainB->setDisabledImage(knob_disabled);
   gainB->setFrameCount(61);
   gainB->setEnabled(true);
   gainB->setGeometry(x0 + 303, y0 + 336, 48, 48);
@@ -873,8 +900,8 @@ void MainWindow::createEditArea()
   connect(gainB, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   bassB = new QImageDial(this);
-  bassB->image().load(":/images/knob_movie.png");
-  bassB->disabledImage().load(":/images/knob_disabled.png");
+  bassB->setImage(knob_movie);
+  bassB->setDisabledImage(knob_disabled);
   bassB->setFrameCount(61);
   bassB->setEnabled(true);
   bassB->setGeometry(x0 + 367, y0 + 336, 48, 48);
@@ -883,8 +910,8 @@ void MainWindow::createEditArea()
   connect(bassB, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   middleB = new QImageDial(this);
-  middleB->image().load(":/images/knob_movie.png");
-  middleB->disabledImage().load(":/images/knob_disabled.png");
+  middleB->setImage(knob_movie);
+  middleB->setDisabledImage(knob_disabled);
   middleB->setFrameCount(61);
   middleB->setEnabled(true);
   middleB->setGeometry(x0 + 431, y0 + 336, 48, 48);
@@ -893,8 +920,8 @@ void MainWindow::createEditArea()
   connect(middleB, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   trebleB = new QImageDial(this);
-  trebleB->image().load(":/images/knob_movie.png");
-  trebleB->disabledImage().load(":/images/knob_disabled.png");
+  trebleB->setImage(knob_movie);
+  trebleB->setDisabledImage(knob_disabled);
   trebleB->setFrameCount(61);
   trebleB->setEnabled(true);
   trebleB->setGeometry(x0 + 495, y0 + 336, 48, 48);
@@ -903,8 +930,8 @@ void MainWindow::createEditArea()
   connect(trebleB, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   presenceB = new QImageDial(this);
-  presenceB->image().load(":/images/knob_movie.png");
-  presenceB->disabledImage().load(":/images/knob_disabled.png");
+  presenceB->setImage(knob_movie);
+  presenceB->setDisabledImage(knob_disabled);
   presenceB->setFrameCount(61);
   presenceB->setEnabled(true);
   presenceB->setGeometry(x0 + 559, y0 + 336, 48, 48);
@@ -913,8 +940,8 @@ void MainWindow::createEditArea()
   connect(presenceB, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   volumeB = new QImageDial(this);
-  volumeB->image().load(":/images/knob_movie.png");
-  volumeB->disabledImage().load(":/images/knob_disabled.png");
+  volumeB->setImage(knob_movie);
+  volumeB->setDisabledImage(knob_disabled);
   volumeB->setFrameCount(61);
   volumeB->setEnabled(true);
   volumeB->setGeometry(x0 + 623, y0 + 336, 48, 48);
@@ -941,16 +968,16 @@ void MainWindow::createEditArea()
   connect(reverbB, SIGNAL(currentIndexChanged(int)), this, SLOT(reverbBChanged(int)));
 
   reverbLedB = new QImageLED(this);
-  reverbLedB->image().load(":/images/led_yellow.png");
-  reverbLedB->disabledImage().load(":/images/led_yellow_disabled.png");
+  reverbLedB->setImage(led_yellow);
+  reverbLedB->setDisabledImage(led_yellow_disabled);
   reverbLedB->setGeometry(x0 + 244, y0 + 232, 31, 31);
   reverbLedB->setEnabled(true);
   reverbLedB->setValue(true);
 
   reverbBypassB = new QImageToggle(this);
   reverbBypassB->setGeometry(x0 + 275, y0 + 232, 44, 31);
-  reverbBypassB->image().load(":/images/onoff.png");
-  reverbBypassB->disabledImage().load(":/images/onoff_disabled.png");
+  reverbBypassB->setImage(onoff);
+  reverbBypassB->setDisabledImage(onoff_disabled);
   reverbBypassB->setEnabled(true);
   reverbBypassB->setTag(CC_REV_BYPASS_B);
   reverbBypassB->setLeftRight(true);
@@ -958,8 +985,8 @@ void MainWindow::createEditArea()
   connect(reverbBypassB, SIGNAL(valueChanged()), this, SLOT(toggleChanged()));
 
   reverbDecayB = new QImageDial(this);
-  reverbDecayB->image().load(":/images/knob_movie.png");
-  reverbDecayB->disabledImage().load(":/images/knob_disabled.png");
+  reverbDecayB->setImage(knob_movie);
+  reverbDecayB->setDisabledImage(knob_disabled);
   reverbDecayB->setFrameCount(61);
   reverbDecayB->setEnabled(true);
   reverbDecayB->setGeometry(x0 + 431, y0 + 235, 48, 48);
@@ -968,8 +995,8 @@ void MainWindow::createEditArea()
   connect(reverbDecayB, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   reverbPredelayB = new QImageDial(this);
-  reverbPredelayB->image().load(":/images/knob_movie.png");
-  reverbPredelayB->disabledImage().load(":/images/knob_disabled.png");
+  reverbPredelayB->setImage(knob_movie);
+  reverbPredelayB->setDisabledImage(knob_disabled);
   reverbPredelayB->setFrameCount(61);
   reverbPredelayB->setEnabled(true);
   reverbPredelayB->setGeometry(x0 + 495, y0 + 235, 48, 48);
@@ -978,8 +1005,8 @@ void MainWindow::createEditArea()
   connect(reverbPredelayB, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   reverbToneB = new QImageDial(this);
-  reverbToneB->image().load(":/images/knob_movie.png");
-  reverbToneB->disabledImage().load(":/images/knob_disabled.png");
+  reverbToneB->setImage(knob_movie);
+  reverbToneB->setDisabledImage(knob_disabled);
   reverbToneB->setFrameCount(61);
   reverbToneB->setEnabled(true);
   reverbToneB->setGeometry(x0 + 559, y0 + 235, 48, 48);
@@ -988,8 +1015,8 @@ void MainWindow::createEditArea()
   connect(reverbToneB, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   reverbMixB = new QImageDial(this);
-  reverbMixB->image().load(":/images/knob_movie.png");
-  reverbMixB->disabledImage().load(":/images/knob_disabled.png");
+  reverbMixB->setImage(knob_movie);
+  reverbMixB->setDisabledImage(knob_disabled);
   reverbMixB->setFrameCount(61);
   reverbMixB->setEnabled(true);
   reverbMixB->setGeometry(x0 + 623, y0 + 235, 48, 48);
@@ -999,63 +1026,63 @@ void MainWindow::createEditArea()
 
   classB = new QImageToggle(this);
   classB->setGeometry(x0 + 720, y0 + 227, 64, 88);
-  classB->image().load(":/images/class.png");
-  classB->disabledImage().load(":/images/class_disabled.png");
+  classB->setImage(classAB);
+  classB->setDisabledImage(class_disabled);
   classB->setEnabled(true);
   classB->setTag(CC_CLASS_B);
   connect(classB, SIGNAL(valueChanged()), this, SLOT(toggleChanged()));
 
   topolB = new QImageToggle4(this);
   topolB->setGeometry(x0 + 804, y0 + 242, 48, 48);
-  topolB->image().load(":/images/I_II_III_IV.png");
-  topolB->disabledImage().load(":/images/I_II_III_IV_disabled.png");
+  topolB->setImage(I_II_III_IV);
+  topolB->setDisabledImage(I_II_III_IV_disabled);
   topolB->setEnabled(true);
   topolB->setTag(CC_TOPOL_B);
   connect(topolB, SIGNAL(valueChanged()), this, SLOT(toggle4Changed()));
 
   xtodeB = new QImageToggle(this);
   xtodeB->setGeometry(x0 + 871, y0 + 227, 64, 88);
-  xtodeB->image().load(":/images/xtode.png");
-  xtodeB->disabledImage().load(":/images/xtode_disabled.png");
+  xtodeB->setImage(xtode);
+  xtodeB->setDisabledImage(xtode_disabled);
   xtodeB->setEnabled(true);
   xtodeB->setTag(CC_XTODE_B);
   connect(xtodeB, SIGNAL(valueChanged()), this, SLOT(toggleChanged()));
 
   boostB = new QImageToggle(this);
   boostB->setGeometry(x0 + 720, y0 + 316, 64, 88);
-  boostB->image().load(":/images/boost.png");
-  boostB->disabledImage().load(":/images/boost_disabled.png");
+  boostB->setImage(boost);
+  boostB->setDisabledImage(boost_disabled);
   boostB->setEnabled(true);
   boostB->setTag(CC_BOOST_B);
   connect(boostB, SIGNAL(valueChanged()), this, SLOT(toggleChanged()));
 
   pivoltB = new QImageToggle(this);
   pivoltB->setGeometry(x0 + 795, y0 + 316, 64, 88);
-  pivoltB->image().load(":/images/piv.png");
-  pivoltB->disabledImage().load(":/images/piv_disabled.png");
+  pivoltB->setImage(piv);
+  pivoltB->setDisabledImage(piv_disabled);
   pivoltB->setEnabled(true);
   pivoltB->setTag(CC_PI_VOLTAGE_B);
   connect(pivoltB, SIGNAL(valueChanged()), this, SLOT(toggleChanged()));
 
   capB = new QImageToggle(this);
   capB->setGeometry(x0 + 871, y0 + 316, 64, 88);
-  capB->image().load(":/images/cap.png");
-  capB->disabledImage().load(":/images/cap_disabled.png");
+  capB->setImage(cap);
+  capB->setDisabledImage(cap_disabled);
   capB->setEnabled(true);
   capB->setTag(CC_CAP_TYPE_B);
   connect(capB, SIGNAL(valueChanged()), this, SLOT(toggleChanged()));
 
   channel = new QImageToggle(this);
   channel->setGeometry(x0 + 39, y0 + 137, 64, 88);
-  channel->image().load(":/images/channel.png");
-  channel->disabledImage().load(":/images/channel_disabled.png");
+  channel->setImage(channelImg);
+  channel->setDisabledImage(channel_disabled);
   channel->setEnabled(true);
   channel->setTag(CC_CHANNEL);
   connect(channel, SIGNAL(valueChanged()), this, SLOT(toggleChanged()));
 
   master = new QImageDial(this);
-  master->image().load(":/images/knob_movie.png");
-  master->disabledImage().load(":/images/knob_disabled.png");
+  master->setImage(knob_movie);
+  master->setDisabledImage(knob_disabled);
   master->setFrameCount(61);
   master->setEnabled(true);
   master->setGeometry(x0 + 140, y0 + 152, 48, 48);
@@ -1064,15 +1091,15 @@ void MainWindow::createEditArea()
   connect(master, SIGNAL(mouseReleased()), this, SLOT(rotaryReleased()));
 
   lowVolLed = new QImageLED(this);
-  lowVolLed->image().load(":/images/led_red.png");
-  lowVolLed->disabledImage().load(":/images/led_red_disabled.png");
+  lowVolLed->setImage(led_red);
+  lowVolLed->setDisabledImage(led_red_disabled);
   lowVolLed->setGeometry(x0 + 171, y0 + 232, 31, 31);
   lowVolLed->setEnabled(true);
 
   lowVol = new QImageToggle(this);
   lowVol->setGeometry(x0 + 37, y0 + 232, 44, 31);
-  lowVol->image().load(":/images/onoff.png");
-  lowVol->disabledImage().load(":/images/onoff_disabled.png");
+  lowVol->setImage(onoff);
+  lowVol->setDisabledImage(onoff_disabled);
   lowVol->setEnabled(true);
   lowVol->setTag(CC_LOWVOLUME);
   lowVol->setLeftRight(true);
@@ -1095,15 +1122,15 @@ void MainWindow::createEditArea()
 
   QImageButton* midiButton = new QImageButton(this);
   midiButton->setGeometry(x0 + 11, y0 - 18, 65, 15);
-  midiButton->image().load(":/images/midi.png");
-  midiButton->disabledImage().load(":/images/midi_disabled.png");
+  midiButton->setImage(midi);
+  midiButton->setDisabledImage(midi_disabled);
   midiButton->setEnabled(true);
   connect(midiButton, SIGNAL(clicked()), this, SLOT(setupMIDI()));
 
   QImageButton* aboutButton = new QImageButton(this);
   aboutButton->setGeometry(x0 + 80, y0 - 18, 65, 15);
-  aboutButton->image().load(":/images/about.png");
-  aboutButton->disabledImage().load(":/images/about_disabled.png");
+  aboutButton->setImage(about);
+  aboutButton->setDisabledImage(about_disabled);
   aboutButton->setEnabled(true);
   connect(aboutButton, SIGNAL(clicked()), this, SLOT(about()));
 }

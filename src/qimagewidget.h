@@ -51,7 +51,9 @@ public:
   QImageWidget(QWidget* parent = 0) :
     QWidget(parent)
   {
-    // Nothing to do here.
+    // Optimize performance:
+    setAttribute(Qt::WA_OpaquePaintEvent, true);
+    setAttribute(Qt::WA_NoSystemBackground, true);
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -72,23 +74,26 @@ public:
   ///\return  The current image.
   ///\remarks This image is the source for the widget.
   //////////////////////////////////////////////////////////////////////////////
-  QImage& image()
+  const QPixmap& image() const
   {
     // Return our image:
     return m_image;
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // QImageWidget::image()
+  // QImageWidget::setImage()
   //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Get accessor for the Image property, const version.
-  ///\return  The current image.
+  ///\brief   Set accessor for the Image property.
+  ///\param   [in] newImage: The new image.
   ///\remarks This image is the source for the widget.
   //////////////////////////////////////////////////////////////////////////////
-  const QImage& image() const
+  void setImage(const QPixmap& newImage)
   {
-    // Return our image:
-    return m_image;
+    // Set new image:
+    m_image = newImage;
+
+    // Force redraw:
+    update();
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -99,24 +104,27 @@ public:
   ///\remarks This image is shown when the widget is disabled. It should have
   ///         the same size as one frame of the knob movie image.
   //////////////////////////////////////////////////////////////////////////////
-  QImage& disabledImage()
+  const QPixmap& disabledImage() const
   {
     // Return our image:
     return m_disabledImage;
   }
 
   //////////////////////////////////////////////////////////////////////////////
-  // QImageWidget::disabledImage()
+  // QImageWidget::setDisabledImage()
   //////////////////////////////////////////////////////////////////////////////
-  ///\brief   Get accessor for the DisabledImage property, const version.
-  ///\return  The current disabled state image.
+  ///\brief   Set accessor for the DisabledImage property.
+  ///\param   [in] newImage: The new image.
   ///\remarks This image is shown when the widget is disabled. It should have
   ///         the same size as one frame of the knob movie image.
   //////////////////////////////////////////////////////////////////////////////
-  const QImage& disabledImage() const
+  void setDisabledImage(const QPixmap& newImage)
   {
-    // Return our image:
-    return m_disabledImage;
+    // Set new image:
+    m_disabledImage = newImage;
+
+    // Force redraw:
+    update();
   }
 
   //////////////////////////////////////////////////////////////////////////////
@@ -196,9 +204,9 @@ private:
 
   //////////////////////////////////////////////////////////////////////////////
   // Member:
-  QImage m_image;         ///\> The knob movie image strip.
-  QImage m_disabledImage; ///\> The knob movie image strip.
-  int    m_tag;           ///\> User defined value.
+  QPixmap m_image;         ///\> The knob movie image strip.
+  QPixmap m_disabledImage; ///\> The knob movie image strip.
+  int     m_tag;           ///\> User defined value.
 };
 
 #endif // __QIMAGEWIDGET_H_INCLUDED__

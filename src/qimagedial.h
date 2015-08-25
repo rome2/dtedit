@@ -469,13 +469,13 @@ protected:
       int y = 0;
 
       // Finally blit the image:
-      qp.drawImage(0, 0, image(), x, y, w, h);
+      qp.drawPixmap(0, 0, image(), x, y, w, h);
     }
 
     else
     {
       // Just show the disabled image:
-      qp.drawImage(0, 0, disabledImage());
+      qp.drawPixmap(0, 0, disabledImage());
     }
   }
 
@@ -521,12 +521,12 @@ private:
   // Member:
   double m_value;        ///\> The current value of this dial.
   double m_defaultValue; ///\> The default value of this value.
-  int m_frameCount;      ///\> The number of frames in the knob movie image.
-  bool m_absoluteMode;   ///\> Use absolute or relative movement?
-  bool m_circularMode;   ///\> Use linear or circular movement?
-  int m_startY;          ///\> Mouse down position for linear movement.
+  int    m_frameCount;   ///\> The number of frames in the knob movie image.
+  bool   m_absoluteMode; ///\> Use absolute or relative movement?
+  bool   m_circularMode; ///\> Use linear or circular movement?
+  int    m_startY;       ///\> Mouse down position for linear movement.
   double m_startVal;     ///\> Value when the movement starts.
-  int m_linearSize;      ///\> Scaling for linear movement.
+  int    m_linearSize;   ///\> Scaling for linear movement.
 };
 
 #endif // __QIMAGEDIAL_H_INCLUDED__
